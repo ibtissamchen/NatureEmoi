@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NatureEmoi</title>
+    <link rel="stylesheet" href="home.css">
+    <link rel="icon" href="icone2.ico">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <section class="top-page">
+        <header class ="header">
+            <img src="image.png" alt="logo du site">
+            <nav class="nav">
+                <li><a href="../plant_care.html" class="dont">Plant care </a></li>
+                <li><a href="../contact.html" class="dont">Contact us</a></li>
+            </nav>
+            <input type="search" placeholder="What plant are you looking for ?">
+            <div class="icon-container">
+                <a href="../cart.html"><i class="fas fa-shopping-bag"></i></a>
+                <span id="cart-count">0</span>
+                <span class="login"><a href="../Espace_Client.html">Log in / Register</a></span>
+            </div>
+        </header>
+        <hr>
+    <p style="margin-top: 130px;">
+        A Community To Buy, Sell & Discover The Magic Of Plants 
+    </p>
+    </section><br><br><br>
+
+    <section class="les-plantes">
+        <nav class="plantes">
+            <div class="plant1">
+                <img src="../Plants/1st plant.jpg" alt="plant" width="150px" height="260px">
+                <h5 style="color:  rgb(40, 167, 199); font-size: 20px" > 199.99 DH  <s style="color: gray; font-size: 15px ;">299.99 DH</s></h5>
+                <h4> Zamioculcas zamiifolia </h4>
+                <h3 style="font-size: 13px ;
+                font-weight: 390;"> Quantity in stock : 24</h3>
+                <button onclick="increaseCart('Zamioculcas zamiifolia')"> Add to cart </button>
+            </div>
+            
+            <div class="plant2">
+                <img src="../Plants/plante4.jpg" alt="plant" width="150px" height="260">
+                <h5 style="color:  rgb(46, 43, 43); font-size: 20px" > 150.00 DH</h5>                
+                <h4>Aglaonema</h4>
+                <h3 style="font-size: 13px ;
+                font-weight: 390;"> Quantity in stock : 32</h3> 
+                <button onclick="increaseCart('Aglaonema')"> Add to cart </button>
+            </div>
+
+            <div class="plant3">
+                <img src="../Plants/plante3.jpg" alt="plant" width="150px" height="260">
+                <h5 style="color:  rgb(40, 167, 199); font-size: 20px" > 50.00 DH  <s style="color: gray; font-size: 15px ;">99.99 DH</s></h5>
+                <h4>Philodendron Xanadu</h4>
+                <h3 style="font-size: 13px ;
+                font-weight: 390;"> Quantity in stock : 17</h3>  
+                <button onclick="increaseCart('Philodendron Xanadu')"> Add to cart </button>
+            </div>
+            
+            <div class="plant4">
+                <img src="../Plants/plant5.jpg" alt="plant" width="150px" height="260">
+                <h5 style="color: rgb(46, 43, 43); font-size: 20px" > 179.99 DH</h5>
+                <h4>Sansevieria trifasciata</h4>
+                <h3 style="font-size: 13px ;
+                font-weight: 390;"> Quantity in stock : 24</h3>
+                <button onclick="increaseCart('Sansevieria trifasciata')"> Add to cart </button>
+            </div>
+        </nav><br><br>
+        <nav class="plantes">
+            <div class="plant1">
+                <img src="../Plants/1st plant.jpg" alt="plant" width="150px" height="260px">
+                <h5 style="color:  rgb(40, 167, 199); font-size: 20px" > 199.99 DH  <s style="color: gray; font-size: 15px ;">299.99 DH</s></h5>
+                <h4> Zamioculcas zamiifolia </h4>
+                <h3 style="font-size: 13px ;
+                font-weight: 390;"> Quantity in stock : 32</h3>
+                <button onclick="increaseCart('Zamioculcas zamiifolia')"> Add to cart </button>
+            </div>
+            
+            <div class="plant2">
+                <img src="../Plants/plante4.jpg" alt="plant" width="150px" height="260">
+                <h5 style="color:  rgb(46, 43, 43); font-size: 20px" > 150.00 DH</h5>                
+                <h4>Aglaonema</h4>
+                <h3 style="font-size: 13px ;
+                font-weight: 390;"> Quantity in stock : 17</h3>
+                <button onclick="increaseCart('Aglaonema')"> Add to cart </button>
+            </div>
+
+            <div class="plant3">
+                <img src="../Plants/plante3.jpg" alt="plant" width="150px" height="260">
+                <h5 style="color:  rgb(40, 167, 199); font-size: 20px" > 50.00 DH  <s style="color: gray; font-size: 15px ;">99.99 DH</s></h5>
+                <h4>Philodendron Xanadu</h4>
+                <h3 style="font-size: 13px ;
+                font-weight: 390;"> Quantity in stock : 45</h3>  
+                <button onclick="increaseCart('Philodendron Xanadu')"> Add to cart </button>
+            </div>
+            
+            <div class="plant4">
+                <img src="../Plants/plant5.jpg" alt="plant" width="150px" height="260">
+                <h5 style="color: rgb(46, 43, 43); font-size: 20px" > 179.99 DH</h5>
+                <h4>Sansevieria trifasciata</h4>
+                <h3 style="font-size: 13px ;
+                font-weight: 390;"> Quantity in stock : 6</h3>
+                <button onclick="increaseCart('Sansevieria trifasciata')"> Add to cart </button>
+            </div>
+        </nav>
+    </section><br><br><br><br>
+    <script>
+        function increaseCart(plantName) {
+            // Update the cart counter
+            const cartElement = document.getElementById("cart-count");
+            let score = parseInt(cartElement.innerText, 10);
+            cartElement.innerText = score + 1;
+    
+            // Add the selected plant to localStorage
+            let cart = JSON.parse(localStorage.getItem("cart")) || [];
+            cart.push(plantName); // Add the selected plant
+            localStorage.setItem("cart", JSON.stringify(cart));
+        }
+    </script>    
+</body>
+</html>

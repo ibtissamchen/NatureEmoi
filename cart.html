@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NatureEmoi</title>
+  <link rel="icon" href="icone2.ico">
+  <link rel="stylesheet" href="cart.css">
+</head>
+<body>
+  <section class="top-page">
+
+    <header class ="header"> 
+      <a href="Home/home.html"><img src="Home/image.png" alt="logo du site" style=" width: 150px;"></a>
+      <nav class="nav">
+        <li><a href="../plant_care.html" class="dont">Plant care </a></li>
+        <li><a href="../contact.html" class="dont">Contact us</a></li>
+      </nav>
+    </header>
+   
+    <font align="center"><h1> Cart </h1></font>   
+    <font align="center">
+    <div class="cart">
+      <div class="paragraph">
+        <p> Your cart is currently empty !</p>
+      </div>
+        <a href="Home/home.html"><button> Return to shop </button></a>
+    </div>
+    </font>
+    <button class="red-button" onclick="clearCart()">Clear cart</button>
+
+  </section>
+  <script>
+    // Fetch cart items from localStorage
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    // Select the cart container
+    const cartContainer = document.querySelector(".cart");
+
+    if (cart.length === 0) {
+        // If the cart is empty, display a message
+        cartContainer.innerHTML = `
+            <div class="paragraph">
+              <p> Your cart is currently empty !</p>
+            </div>
+            <a href="Home/home.html"><button>Return to shop</button></a>
+        `;
+    } else {
+        // If there are items in the cart, display them
+        cartContainer.innerHTML = `
+            <div class="paragraph"><p>Your cart has these plants:</p>
+            <ul >${cart.map(plant => `<li>${plant}</li>`).join("")}</ul></div>
+            <a href="Home/home.html"><button>Return to shop</button></a>
+        `;
+    }
+
+    function clearCart() {
+        localStorage.removeItem("cart");
+        location.reload(); // Refresh the page to update the cart view
+    }
+
+  </script>
+</body>
+</html>

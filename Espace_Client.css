@@ -1,0 +1,76 @@
+body{
+  background-image: url("Home/background.png") ;
+  background-repeat: no-repeat; 
+   background-size: cover; 
+  background-position: center; 
+  margin: 0; 
+  padding: 0; 
+  height: 100vh; 
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f9;
+  
+}
+h1 {
+text-align: center;
+color: #ebf3ec;
+font-family:'Times New Roman', Times, serif;
+font-size: 50px;
+margin-top: 50px;
+}
+
+form {
+max-width: 500px;
+margin: 30px auto;
+padding: 20px;
+border-radius: 8px;
+max-width: 500px;
+background-color: rgba(255, 255, 255, 0.103);
+border-radius: 8px;
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.788);
+}
+
+/* Styles pour les labels */
+label {
+font-weight: bold;
+margin-bottom: 5px;
+display: block;
+}
+
+/* Styles pour les champs de saisie */
+input[type="text"],
+input[type="email"],
+input[type="tel"] {
+width: 100%;
+padding: 10px;
+margin-bottom: 15px;
+border: 1px solid #ddd;
+border-radius: 5px;
+box-sizing: border-box;
+}
+
+/* Styles pour le bouton */
+button {
+background-color: #4CAF50;
+color: white;
+padding: 10px 15px;
+border: none;
+border-radius: 5px;
+width: 100%;
+cursor: pointer;
+font-size: 16px;
+}
+
+/* Changer la couleur du bouton au survol */
+button:hover {
+background-color: #45a049;
+}
+
+/* Ajouter un style aux champs obligatoires */
+input[required] {
+background-color: #f9f9f9;
+}
+
+/* Espacement général entre les éléments */
+br {
+margin-bottom: 10px;
+}
