@@ -1,0 +1,46 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class Utilisateur {
+  - id : int
+  - nom : String
+  - email : String
+  - motDePasse : String
+}
+
+class Plante {
+  - id : int
+  - nom : String
+  - description : String
+  - prix : double
+  - stock : int
+  - imageUrl : String
+}
+
+class Commande {
+  - id : int
+  - dateCommande : Date
+  - statut : String
+  - total : double
+}
+
+class LigneCommande {
+  - quantite : int
+  - prixUnitaire : double
+}
+
+class Panier {
+  - id : int
+  - dateCreation : Date
+}
+
+Utilisateur "1" -- "0..1" Panier : a un >
+
+Panier "1" -- "*" LigneCommande : contient >
+
+Plante "1" -- "*" LigneCommande : est inclus dans >
+
+Utilisateur "1" -- "*" Commande : passe >
+
+Commande "1" -- "*" LigneCommande : contient >
+@enduml

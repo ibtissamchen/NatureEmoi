@@ -1,0 +1,19 @@
+@startuml
+left to right direction
+
+actor Client
+
+rectangle "Site de Vente de Plantes" {
+  usecase "Parcourir le Catalogue" as UC_Parcourir
+  usecase "Ajouter au Panier" as UC_Panier
+  usecase "Passer Commande" as UC_Commander
+  usecase "S'inscrire / Se Connecter" as UC_Auth
+
+}
+
+Client --> UC_Parcourir
+Client --> UC_Panier
+Client --> UC_Commander
+Client --> UC_Auth
+
+@enduml

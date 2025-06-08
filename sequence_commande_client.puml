@@ -1,0 +1,19 @@
+@startuml
+actor Client
+participant "Interface Web" as UI
+participant "Panier" as Cart
+participant "ServiceCommande" as OrderService
+database "BaseDeDonnées" as DB
+
+Client -> UI : Cliquer sur "Passer commande"
+UI -> Cart : getContenu()
+Cart -> UI : liste des plantes + quantités
+UI -> OrderService : passerCommande(contenu, clientId)
+OrderService -> DB : vérifier stock
+DB --> OrderService : stock OK
+OrderService -> DB : enregistrer commande
+DB --> OrderService : idCommande
+OrderService -> DB : décrémenter stock
+OrderService --> UI : commande confirmée
+UI --> Client : Affichage confirmation
+@enduml

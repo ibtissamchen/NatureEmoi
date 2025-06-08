@@ -1,0 +1,25 @@
+@startuml
+title Diagramme de Séquence : Connexion d'un Client
+
+actor Client
+participant "Interface Web" as Web
+participant "ServiceAuthentification" as Auth
+database "BaseDeDonnées" as DB
+
+Client -> Web : Ouvre le site / Clic sur "Se Connecter"
+Web --> Client : Affiche formulaire de connexion (email, mot de passe)
+Client -> Web : Saisit identifiants\n(email, motDePasse) et clique "Valider"
+
+Web -> Auth : authentifier(email, motDePasse)
+Auth -> DB : vérifierCredentials(email, motDePasse)
+DB --> Auth : utilisateurTrouvé(idClient) ou credentialsInvalides
+
+alt Connexion Réussie
+    Auth --> Web : connexionRéussie(idClient, tokenSession)
+    Web --> Client : Affiche confirmation de connexion\nou redirige vers le tableau de bord
+else Connexion Échouée
+    Auth --> Web : connexionÉchouée(messageErreur)
+    Web --> Client : Affiche message d'erreur\n(ex: "Email ou mot de passe incorrect")
+end
+
+@enduml
