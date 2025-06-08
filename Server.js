@@ -1,4 +1,4 @@
-// server.js - Version complète avec recherche et panier
+// server.js - Version complète avec recherche et panier CORRIGÉE ET DÉBOGUÉE
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -108,29 +108,287 @@ app.get('/cart', (req, res) => {
 });
 
 // ============================================
-// NOUVELLES APIs DE RECHERCHE
+// ROUTES POUR LES PLANTES (FRONTEND) - CORRIGÉES
 // ============================================
 
-// Route de recherche principale
+// Route pour récupérer toutes les plantes (pour home.html et fetchPlants())
+app.get('/plantes', async (req, res) => {
+    try {
+        console.log('🌱 Récupération des plantes...');
+        
+        const plantes = await Plant.findAll({
+            where: { isAvailable: true },
+            include: [{
+                model: Category,
+                attributes: ['id', 'name'],
+                required: false
+            }],
+            order: [['name', 'ASC']]
+        });
+        
+        console.log(`✅ ${plantes.length} plante(s) trouvée(s)`);
+        
+        // Formatter les données pour correspondre au frontend français
+        const plantesFormatted = plantes.map(plant => ({
+            id: plant.id,
+            nom: plant.name, // Convertir 'name' vers 'nom'
+            prix: parseFloat(plant.price),
+            quantité_en_stock: plant.stockQuantity, // Convertir 'stockQuantity' vers 'quantité_en_stock'
+            description: plant.description || 'Description non disponible',
+            photo: plant.imageUrl || '/Plants/default.jpg',
+            nom_scientifique: plant.scientificName || '',
+            categorie: plant.Category ? plant.Category.name : 'Non catégorisé'
+        }));
+        
+        res.json(plantesFormatted);
+        
+    } catch (error) {
+        console.error('❌ Erreur lors de la récupération des plantes:', error);
+        res.status(500).json({ 
+            error: 'Erreur serveur lors de la récupération des plantes' 
+        });
+    }
+});
+
+// Route pour gérer le stock des plantes - VERSION SEQUELIZE CORRIGÉE
+app.put('/plantes/stock', async (req, res) => {
+    try {
+        const { nom, action, quantity = 1 } = req.body;
+        
+        console.log('🔄 Gestion du stock:', { nom, action, quantity });
+        
+        if (!nom || !action) {
+            return res.status(400).json({ error: 'Nom de plante et action requis' });
+        }
+        
+        // Chercher la plante par nom avec Sequelize
+        const plant = await Plant.findOne({
+            where: { name: nom } // 'name' en anglais dans la base, 'nom' en français depuis le frontend
+        });
+        
+        if (!plant) {
+            console.log('❌ Plante non trouvée:', nom);
+            return res.status(404).json({ error: 'Plante non trouvée' });
+        }
+        
+        console.log('✅ Plante trouvée:', plant.name, 'Stock actuel:', plant.stockQuantity);
+        
+        let newStock;
+        
+        if (action === 'decrease') {
+            // Vérifier si assez de stock
+            if (plant.stockQuantity < quantity) {
+                return res.status(400).json({ error: 'Stock insuffisant' });
+            }
+            newStock = plant.stockQuantity - quantity;
+        } else if (action === 'increase') {
+            newStock = plant.stockQuantity + quantity;
+        } else {
+            return res.status(400).json({ error: 'Action invalide' });
+        }
+        
+        // Mettre à jour le stock avec Sequelize
+        await plant.update({
+            stockQuantity: newStock
+        });
+        
+        console.log('✅ Stock mis à jour:', plant.name, 'Nouveau stock:', newStock);
+        
+        res.json({ 
+            success: true, 
+            message: 'Stock mis à jour',
+            newStock: newStock,
+            plantName: nom
+        });
+        
+    } catch (error) {
+        console.error('❌ Erreur lors de la mise à jour du stock:', error);
+        res.status(500).json({ 
+            error: 'Erreur serveur lors de la mise à jour du stock' 
+        });
+    }
+});
+
+// ============================================
+// ROUTE POUR CRÉER LES PLANTES AVEC LES BONS NOMS DE COLONNES
+// ============================================
+
+app.get('/create-plants-final', async (req, res) => {
+    try {
+        const plants = [
+            {
+                name: 'Zamioculcas zamiifolia',
+                scientific_name: 'Zamioculcas zamiifolia',
+                description: 'Une plante résistante parfaite pour les débutants',
+                price: 199.99,
+                stock_quantity: 32,
+                image_url: '/Plants/1st plant.jpg',
+                category_id: 1, // Plantes d'intérieur
+                care_instructions: 'Arroser quand le sol est sec',
+                light_requirements: 'Lumière indirecte',
+                water_frequency: '1 fois par semaine',
+                size: 'Moyenne',
+                difficulty_level: 'Facile',
+                is_available: 1
+            },
+            {
+                name: 'Aglaonema',
+                scientific_name: 'Aglaonema modestum',
+                description: 'Plante tropicale aux feuilles colorées',
+                price: 150.00,
+                stock_quantity: 17,
+                image_url: '/Plants/plante4.jpg',
+                category_id: 1,
+                care_instructions: 'Arroser régulièrement',
+                light_requirements: 'Lumière indirecte',
+                water_frequency: '2 fois par semaine',
+                size: 'Moyenne',
+                difficulty_level: 'Facile',
+                is_available: 1
+            },
+            {
+                name: 'Philodendron Xanadu',
+                scientific_name: 'Thaumatophyllum xanadu',
+                description: 'Philodendron compact aux feuilles lobées',
+                price: 50.00,
+                stock_quantity: 45,
+                image_url: '/Plants/plante3.jpg',
+                category_id: 1,
+                care_instructions: 'Arroser modérément',
+                light_requirements: 'Lumière indirecte',
+                water_frequency: '1-2 fois par semaine',
+                size: 'Moyenne',
+                difficulty_level: 'Facile',
+                is_available: 1
+            },
+            {
+                name: 'Sansevieria trifasciata',
+                scientific_name: 'Sansevieria trifasciata',
+                description: 'Langue de belle-mère, très résistante',
+                price: 179.99,
+                stock_quantity: 6,
+                image_url: '/Plants/plant5.jpg',
+                category_id: 1,
+                care_instructions: 'Très peu d\'eau',
+                light_requirements: 'Toutes lumières',
+                water_frequency: '1 fois par mois',
+                size: 'Grande',
+                difficulty_level: 'Très facile',
+                is_available: 1
+            }
+        ];
+
+        const results = [];
+        
+        for (const plantData of plants) {
+            try {
+                // Vérifier si la plante existe déjà
+                const [existing] = await sequelize.query(
+                    "SELECT id FROM Plants WHERE name = ?",
+                    { replacements: [plantData.name] }
+                );
+
+                if (existing.length === 0) {
+                    // Créer la plante avec tous les champs requis
+                    await sequelize.query(`
+                        INSERT INTO Plants (
+                            name, scientific_name, description, price, stock_quantity, 
+                            category_id, image_url, care_instructions, light_requirements, 
+                            water_frequency, size, difficulty_level, is_available, 
+                            created_at, updated_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+                    `, {
+                        replacements: [
+                            plantData.name,
+                            plantData.scientific_name,
+                            plantData.description,
+                            plantData.price,
+                            plantData.stock_quantity,
+                            plantData.category_id,
+                            plantData.image_url,
+                            plantData.care_instructions,
+                            plantData.light_requirements,
+                            plantData.water_frequency,
+                            plantData.size,
+                            plantData.difficulty_level,
+                            plantData.is_available
+                        ]
+                    });
+                    
+                    results.push({ created: plantData.name });
+                } else {
+                    results.push({ exists: plantData.name });
+                }
+                
+            } catch (error) {
+                console.error(`Erreur pour ${plantData.name}:`, error);
+                results.push({ error: plantData.name, message: error.message });
+            }
+        }
+
+        res.json({
+            success: true,
+            message: 'Plantes créées avec succès!',
+            results: results
+        });
+        
+    } catch (error) {
+        console.error('Erreur générale:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ============================================
+// NOUVELLES APIs DE RECHERCHE - CORRIGÉES ET DÉBOGUÉES
+// ============================================
+
+// Route de recherche principale - CORRIGÉE AVEC DEBUG COMPLET
 app.get('/api/search/plants', async (req, res) => {
     try {
-        console.log('🔍 === RECHERCHE DE PLANTES ===');
+        console.log('🔍 === RECHERCHE DE PLANTES DEBUG ===');
         
         const { query, category, minPrice, maxPrice, difficulty, size } = req.query;
-        console.log('Paramètres de recherche:', { query, category, minPrice, maxPrice, difficulty, size });
+        console.log('Paramètres de recherche reçus:', { query, category, minPrice, maxPrice, difficulty, size });
+        
+        // ÉTAPE 1: Tester d'abord une requête simple pour voir toutes les plantes
+        console.log('📊 Test: Récupération de toutes les plantes disponibles...');
+        const allPlants = await Plant.findAll({
+            where: { isAvailable: true },
+            attributes: ['id', 'name', 'scientific_name', 'description'],
+            limit: 5,
+            raw: true
+        });
+        console.log('Plantes disponibles (échantillon):', allPlants);
         
         // Construction des conditions de recherche
         const searchConditions = {
             isAvailable: true // Seulement les plantes disponibles
         };
         
-        // Recherche textuelle (nom ou nom scientifique)
+        // Recherche textuelle (nom ou nom scientifique) - INSENSIBLE À LA CASSE
         if (query && query.trim().length > 0) {
-            const searchTerm = query.trim();
+            const searchTerm = query.trim().toLowerCase();
+            console.log('🔍 Terme de recherche:', searchTerm);
+            
+            // CORRECTION MAJEURE: Utiliser le bon nom de colonne selon votre base
+            // Vérifiez dans l'échantillon ci-dessus quel est le vrai nom de la colonne
             searchConditions[Op.or] = [
-                { name: { [Op.like]: `%${searchTerm}%` } },
-                { scientificName: { [Op.like]: `%${searchTerm}%` } },
-                { description: { [Op.like]: `%${searchTerm}%` } }
+                sequelize.where(
+                    sequelize.fn('LOWER', sequelize.col('name')), 
+                    'LIKE', 
+                    `%${searchTerm}%`
+                ),
+                // ATTENTION: Utiliser scientific_name (avec underscore) comme dans votre création de plantes
+                sequelize.where(
+                    sequelize.fn('LOWER', sequelize.col('scientific_name')), 
+                    'LIKE', 
+                    `%${searchTerm}%`
+                ),
+                sequelize.where(
+                    sequelize.fn('LOWER', sequelize.col('description')), 
+                    'LIKE', 
+                    `%${searchTerm}%`
+                )
             ];
         }
         
@@ -156,116 +414,329 @@ app.get('/api/search/plants', async (req, res) => {
             searchConditions.size = size;
         }
         
-        console.log('Conditions de recherche:', searchConditions);
+        console.log('🔧 Conditions de recherche construites:', JSON.stringify(searchConditions, null, 2));
         
-        // Exécution de la recherche
-        const plants = await Plant.findAll({
-            where: searchConditions,
-            include: [{
-                model: Category,
-                attributes: ['id', 'name'],
-                required: false
-            }],
-            order: [
-                // Tri par pertinence : d'abord les correspondances exactes dans le nom
-                query ? [
-                    sequelize.literal(`CASE 
-                        WHEN name LIKE '${query}%' THEN 1 
-                        WHEN name LIKE '%${query}%' THEN 2 
-                        ELSE 3 
-                    END`)
-                ] : ['name', 'ASC']
-            ],
-            limit: 50 // Limite pour les performances
+        // ÉTAPE 2: Exécution de la recherche avec gestion d'erreur
+        console.log('⚡ Exécution de la recherche...');
+        let plants;
+        try {
+            plants = await Plant.findAll({
+                where: searchConditions,
+                include: [{
+                    model: Category,
+                    attributes: ['id', 'name'],
+                    required: false
+                }],
+                order: [['name', 'ASC']],
+                limit: 50
+            });
+        } catch (searchError) {
+            console.error('❌ Erreur lors de l\'exécution de la recherche:', searchError);
+            
+            // Tentative avec une requête plus simple sans fonctions SQL
+            console.log('🔄 Tentative de recherche simplifiée...');
+            const simpleConditions = { isAvailable: true };
+            
+            if (query && query.trim().length > 0) {
+                const searchTerm = query.trim().toLowerCase();
+                // Utiliser une approche différente si LOWER() pose problème
+                simpleConditions[Op.or] = [
+                    { name: { [Op.like]: `%${query}%` } },
+                    { scientific_name: { [Op.like]: `%${query}%` } },
+                    { description: { [Op.like]: `%${query}%` } }
+                ];
+            }
+            
+            plants = await Plant.findAll({
+                where: simpleConditions,
+                include: [{
+                    model: Category,
+                    attributes: ['id', 'name'],
+                    required: false
+                }],
+                order: [['name', 'ASC']],
+                limit: 50
+            });
+        }
+        
+        console.log(`✅ ${plants.length} plante(s) trouvée(s) avec la recherche`);
+        
+        // DEBUG: Afficher les premières plantes trouvées
+        if (plants.length > 0) {
+            console.log('🌱 Première plante trouvée:', {
+                id: plants[0].id,
+                name: plants[0].name,
+                scientificName: plants[0].scientific_name || plants[0].scientificName,
+                description: plants[0].description?.substring(0, 50) + '...'
+            });
+        } else {
+            console.log('⚠️ Aucune plante trouvée - vérifiez les conditions');
+        }
+        
+        // Formatage des résultats - ATTENTION au mapping des champs
+        const formattedResults = plants.map(plant => {
+            // Gérer les deux possibilités de noms de colonnes
+            const scientificName = plant.scientific_name || plant.scientificName || '';
+            
+            return {
+                id: plant.id,
+                name: plant.name,
+                scientificName: scientificName,
+                description: plant.description,
+                price: parseFloat(plant.price),
+                stockQuantity: plant.stockQuantity || plant.stock_quantity,
+                imageUrl: plant.imageUrl || plant.image_url,
+                careInstructions: plant.careInstructions || plant.care_instructions,
+                lightRequirements: plant.lightRequirements || plant.light_requirements,
+                waterFrequency: plant.waterFrequency || plant.water_frequency,
+                size: plant.size,
+                difficultyLevel: plant.difficultyLevel || plant.difficulty_level,
+                category: plant.Category ? plant.Category.name : null,
+                categoryId: plant.categoryId || plant.category_id
+            };
         });
-        
-        console.log(`✅ ${plants.length} plante(s) trouvée(s)`);
-        
-        // Formatage des résultats
-        const formattedResults = plants.map(plant => ({
-            id: plant.id,
-            name: plant.name,
-            scientificName: plant.scientificName,
-            description: plant.description,
-            price: parseFloat(plant.price),
-            stockQuantity: plant.stockQuantity,
-            imageUrl: plant.imageUrl,
-            careInstructions: plant.careInstructions,
-            lightRequirements: plant.lightRequirements,
-            waterFrequency: plant.waterFrequency,
-            size: plant.size,
-            difficultyLevel: plant.difficultyLevel,
-            category: plant.Category ? plant.Category.name : null,
-            categoryId: plant.categoryId
-        }));
         
         res.json({
             success: true,
             query: query || '',
             totalResults: plants.length,
-            plants: formattedResults
+            plants: formattedResults,
+            debug: {
+                searchTerm: query?.toLowerCase(),
+                allPlantsCount: allPlants.length,
+                searchConditionsUsed: searchConditions,
+                samplePlants: allPlants
+            }
         });
         
     } catch (error) {
         console.error('❌ Erreur lors de la recherche:', error);
+        console.error('Stack trace complète:', error.stack);
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la recherche',
-            error: error.message
+            error: error.message,
+            stack: error.stack,
+            debug: true
         });
     }
 });
 
-// Route pour obtenir les suggestions de recherche (autocomplétion)
+// Route pour obtenir les suggestions de recherche (autocomplétion) - CORRIGÉE
 app.get('/api/search/suggestions', async (req, res) => {
     try {
         const { query } = req.query;
+        console.log('🔍 Suggestions pour:', query);
         
         if (!query || query.trim().length < 2) {
             return res.json({ success: true, suggestions: [] });
         }
         
-        const searchTerm = query.trim();
+        const searchTerm = query.trim().toLowerCase();
+        console.log('🎯 Terme de recherche suggestions:', searchTerm);
         
-        // Recherche de suggestions
-        const plants = await Plant.findAll({
-            where: {
-                [Op.or]: [
-                    { name: { [Op.like]: `%${searchTerm}%` } },
-                    { scientificName: { [Op.like]: `%${searchTerm}%` } }
-                ],
-                isAvailable: true
-            },
-            attributes: ['name', 'scientificName'],
+        // Test simple d'abord pour voir toutes les plantes
+        const allPlants = await Plant.findAll({
+            where: { isAvailable: true },
+            attributes: ['name', 'scientific_name'],
             limit: 10,
-            order: [
-                sequelize.literal(`CASE 
-                    WHEN name LIKE '${searchTerm}%' THEN 1 
-                    WHEN scientific_name LIKE '${searchTerm}%' THEN 2 
-                    ELSE 3 
-                END`)
-            ]
+            raw: true
         });
+        console.log('📋 Toutes les plantes pour suggestions:', allPlants.map(p => ({ name: p.name, scientific: p.scientific_name })));
+        
+        // Recherche de suggestions - version robuste
+        let plants;
+        try {
+            // Essayer avec LOWER() d'abord
+            plants = await Plant.findAll({
+                where: {
+                    [Op.or]: [
+                        sequelize.where(
+                            sequelize.fn('LOWER', sequelize.col('name')), 
+                            'LIKE', 
+                            `%${searchTerm}%`
+                        ),
+                        sequelize.where(
+                            sequelize.fn('LOWER', sequelize.col('scientific_name')), 
+                            'LIKE', 
+                            `%${searchTerm}%`
+                        )
+                    ],
+                    isAvailable: true
+                },
+                attributes: ['name', 'scientific_name'],
+                limit: 10,
+                order: [['name', 'ASC']],
+                raw: true
+            });
+        } catch (lowerError) {
+            console.log('⚠️ LOWER() failed, trying simple LIKE...');
+            // Fallback sans LOWER()
+            plants = await Plant.findAll({
+                where: {
+                    [Op.or]: [
+                        { name: { [Op.like]: `%${query}%` } },
+                        { scientific_name: { [Op.like]: `%${query}%` } }
+                    ],
+                    isAvailable: true
+                },
+                attributes: ['name', 'scientific_name'],
+                limit: 10,
+                order: [['name', 'ASC']],
+                raw: true
+            });
+        }
+        
+        console.log('📝 Suggestions trouvées:', plants.length);
         
         // Formatage des suggestions
         const suggestions = plants.map(plant => ({
             name: plant.name,
-            scientificName: plant.scientificName,
-            displayText: plant.scientificName ? 
-                `${plant.name} (${plant.scientificName})` : 
+            scientificName: plant.scientific_name,
+            displayText: plant.scientific_name ? 
+                `${plant.name} (${plant.scientific_name})` : 
                 plant.name
         }));
         
         res.json({
             success: true,
-            suggestions: suggestions
+            suggestions: suggestions,
+            debug: {
+                searchTerm,
+                totalPlants: allPlants.length,
+                foundSuggestions: suggestions.length,
+                allPlantsNames: allPlants.map(p => p.name)
+            }
         });
         
     } catch (error) {
         console.error('❌ Erreur lors de la génération des suggestions:', error);
         res.status(500).json({
             success: false,
-            message: 'Erreur lors de la génération des suggestions'
+            message: 'Erreur lors de la génération des suggestions',
+            error: error.message
+        });
+    }
+});
+
+// ============================================
+// ROUTE DE DEBUG POUR VÉRIFIER LA STRUCTURE
+// ============================================
+
+app.get('/api/debug/plant-structure', async (req, res) => {
+    try {
+        console.log('🔍 Debug de la structure des plantes...');
+        
+        // 1. Vérifier la structure de la table
+        const [tableInfo] = await sequelize.query("PRAGMA table_info(Plants)");
+        console.log('📋 Structure de la table Plants:', tableInfo);
+        
+        // 2. Récupérer quelques plantes pour voir les données réelles
+        const [rawPlants] = await sequelize.query("SELECT * FROM Plants LIMIT 3");
+        console.log('🌱 Échantillon de plantes (données brutes SQL):', rawPlants);
+        
+        // 3. Récupérer avec Sequelize
+        const sequelizePlants = await Plant.findAll({
+            limit: 3,
+            raw: true
+        });
+        console.log('🔧 Échantillon avec Sequelize:', sequelizePlants);
+        
+        // 4. Test de recherche simple
+        const testSearch = await Plant.findAll({
+            where: {
+                name: { [Op.like]: '%Aglaonema%' }
+            },
+            limit: 5,
+            raw: true
+        });
+        console.log('🎯 Test de recherche "Aglaonema":', testSearch);
+        
+        // 5. Test avec scientific_name
+        const testScientific = await Plant.findAll({
+            where: {
+                scientific_name: { [Op.like]: '%Aglaonema%' }
+            },
+            limit: 5,
+            raw: true
+        });
+        console.log('🧬 Test de recherche scientific_name "Aglaonema":', testScientific);
+        
+        res.json({
+            success: true,
+            tableStructure: tableInfo,
+            rawSQLData: rawPlants,
+            sequelizeData: sequelizePlants,
+            nameSearchResults: testSearch.length,
+            scientificSearchResults: testScientific.length,
+            message: 'Debug de la structure terminé - vérifiez la console pour les détails'
+        });
+        
+    } catch (error) {
+        console.error('❌ Erreur debug:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message,
+            stack: error.stack
+        });
+    }
+});
+
+// ============================================
+// TEST DE RECHERCHE SIMPLE
+// ============================================
+
+app.get('/api/test-search', async (req, res) => {
+    try {
+        console.log('🧪 Test de recherche simple...');
+        
+        // Test 1: Recherche par nom exact
+        const exactMatch = await Plant.findAll({
+            where: { name: 'Aglaonema' },
+            raw: true
+        });
+        console.log('Test 1 - Correspondance exacte "Aglaonema":', exactMatch.length);
+        
+        // Test 2: Recherche avec LIKE
+        const likeMatch = await Plant.findAll({
+            where: {
+                name: { [Op.like]: '%Aglaonema%' }
+            },
+            raw: true
+        });
+        console.log('Test 2 - LIKE "Aglaonema":', likeMatch.length);
+        
+        // Test 3: Recherche insensible à la casse
+        const iLikeMatch = await Plant.findAll({
+            where: {
+                name: { [Op.like]: '%aglaonema%' }
+            },
+            raw: true
+        });
+        console.log('Test 3 - LIKE "aglaonema" (minuscules):', iLikeMatch.length);
+        
+        // Test 4: Toutes les plantes
+        const allPlants = await Plant.findAll({
+            attributes: ['name', 'scientific_name'],
+            raw: true
+        });
+        console.log('Test 4 - Toutes les plantes:', allPlants.map(p => p.name));
+        
+        res.json({
+            success: true,
+            tests: {
+                exactMatch: exactMatch.length,
+                likeMatch: likeMatch.length,
+                iLikeMatch: iLikeMatch.length,
+                allPlants: allPlants.map(p => ({ name: p.name, scientific: p.scientific_name }))
+            }
+        });
+        
+    } catch (error) {
+        console.error('❌ Erreur test de recherche:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
         });
     }
 });
@@ -317,17 +788,17 @@ app.get('/api/plants/:id', async (req, res) => {
             plant: {
                 id: plant.id,
                 name: plant.name,
-                scientificName: plant.scientificName,
+                scientificName: plant.scientificName || plant.scientific_name,
                 description: plant.description,
                 price: parseFloat(plant.price),
-                stockQuantity: plant.stockQuantity,
-                imageUrl: plant.imageUrl,
-                careInstructions: plant.careInstructions,
-                lightRequirements: plant.lightRequirements,
-                waterFrequency: plant.waterFrequency,
+                stockQuantity: plant.stockQuantity || plant.stock_quantity,
+                imageUrl: plant.imageUrl || plant.image_url,
+                careInstructions: plant.careInstructions || plant.care_instructions,
+                lightRequirements: plant.lightRequirements || plant.light_requirements,
+                waterFrequency: plant.waterFrequency || plant.water_frequency,
                 size: plant.size,
-                difficultyLevel: plant.difficultyLevel,
-                isAvailable: plant.isAvailable,
+                difficultyLevel: plant.difficultyLevel || plant.difficulty_level,
+                isAvailable: plant.isAvailable || plant.is_available,
                 category: plant.Category,
                 createdAt: plant.createdAt,
                 updatedAt: plant.updatedAt
@@ -344,7 +815,7 @@ app.get('/api/plants/:id', async (req, res) => {
 });
 
 // ============================================
-// NOUVELLES APIs POUR LE PANIER
+// NOUVELLES APIs POUR LE PANIER - CORRIGÉES
 // ============================================
 
 // Route pour ajouter un article au panier
@@ -491,13 +962,37 @@ app.delete('/api/cart/:cartItemId', async (req, res) => {
     }
 });
 
+// ============================================
+// ROUTES DE DEBUG
+// ============================================
+
+// Route pour vérifier la structure de la table Plants
+app.get('/check-table', async (req, res) => {
+    try {
+        // Vérifier la structure de la table
+        const [columns] = await sequelize.query("PRAGMA table_info(Plants)");
+        
+        // Vérifier le contenu actuel
+        const [rows] = await sequelize.query("SELECT * FROM Plants");
+        
+        res.json({
+            tableStructure: columns,
+            currentData: rows,
+            message: "Structure et contenu de la table Plants"
+        });
+        
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // API de statut
 app.get('/api/status', (req, res) => {
     res.json({ 
         message: 'API fonctionnelle avec authentification, recherche et panier', 
         status: 'OK',
         timestamp: new Date().toISOString(),
-        features: ['inscription', 'connexion', 'hashage-mot-de-passe', 'recherche', 'panier'],
+        features: ['inscription', 'connexion', 'hashage-mot-de-passe', 'recherche', 'panier', 'gestion-stock'],
         defaultPage: 'Espace_Client.html'
     });
 });
@@ -766,7 +1261,7 @@ app.post('/api/login', loginLimiter, async (req, res) => {
 });
 
 // ============================================
-// ROUTES DE DEBUG
+// ROUTES DE DEBUG SUPPLÉMENTAIRES
 // ============================================
 
 // Route pour voir tous les utilisateurs
@@ -842,15 +1337,27 @@ async function startServer() {
         
         app.listen(PORT, '127.0.0.1', () => {
             console.log('\n🔐 ========================');
-            console.log(`🚀 SERVEUR COMPLET lancé sur http://localhost:${PORT}`);
+            console.log(`🚀 SERVEUR COMPLET DÉBOGUÉ lancé sur http://localhost:${PORT}`);
             console.log('🎯 PAGE D\'ACCUEIL: Espace Client (Inscription/Connexion)');
             console.log('🛡️ Fonctionnalités activées:');
             console.log('   ✅ Authentification sécurisée');
-            console.log('   ✅ Recherche de plantes');
+            console.log('   ✅ Recherche de plantes INSENSIBLE À LA CASSE DÉBOGUÉE');
             console.log('   ✅ Gestion du panier');
-            console.log('   ✅ APIs complètes');
+            console.log('   ✅ Gestion du stock en temps réel');
+            console.log('   ✅ APIs complètes avec debug');
             console.log('🌐 URLs principales:');
             console.log('   🔐 PAGE D\'ACCUEIL: http://localhost:3000/ (Espace Client)');
+            console.log('   🏠 PAGE PRODUITS: http://localhost:3000/home');
+            console.log('   🛒 PANIER: http://localhost:3000/cart.html');
+            console.log('   🌱 API PLANTES: http://localhost:3000/plantes');
+            console.log('   📊 API STATUS: http://localhost:3000/api/status');
+            console.log('   🔧 CRÉER PLANTES: http://localhost:3000/create-plants-final');
+            console.log('   🔍 DEBUG STRUCTURE: http://localhost:3000/api/debug/plant-structure');
+            console.log('   🧪 TEST RECHERCHE: http://localhost:3000/api/test-search');
+            console.log('🆘 Pour résoudre le problème de recherche:');
+            console.log('   1. Visitez d\'abord: http://localhost:3000/api/debug/plant-structure');
+            console.log('   2. Puis: http://localhost:3000/api/test-search');
+            console.log('   3. Vérifiez les logs de la console pour identifier le problème');
         });
     } catch (error) {
         console.error('❌ Erreur lors du démarrage:', error);

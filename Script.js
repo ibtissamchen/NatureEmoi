@@ -67,7 +67,12 @@ async function fetchPlants() {
                 <p>Prix : ${plant.prix} €</p>
                 <p>Quantité en stock : ${plant.quantité_en_stock}</p>
                 <p>${plant.description}</p>
+                <button class="add-to-cart-btn">Ajouter au panier</button>
             `;
+
+            // Connecter le bouton à la fonction addToCart
+            const addButton = plantCard.querySelector('.add-to-cart-btn');
+            addButton.addEventListener('click', () => addToCart(plant));
 
             plantsContainer.appendChild(plantCard);
         });
@@ -77,20 +82,21 @@ async function fetchPlants() {
 }
 
 // Fonction pour ajouter au panier
-function addToCart(plantName, price) {
+function addToCart(plant) {
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
     
     // Stocker seulement les propriétés nécessaires
     const plantItem = {
-        nom: plantName,  // Utiliser 'nom' au lieu de 'name' pour la cohérence
-        prix: price,
-        quantité: 1
+        id: plant.id,
+        nom: plant.nom,
+        prix: plant.prix,
+        photo: plant.photo
     };
     
     cart.push(plantItem);
     localStorage.setItem('cart', JSON.stringify(cart));
     
-    alert(`${plantName} ajouté au panier !`);
+    alert(`${plant.nom} ajouté au panier !`);
 }
 
 // Call the function to load the plants when the page loads

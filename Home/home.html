@@ -8,9 +8,11 @@
     <link rel="icon" href="icone2.ico">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
-    <!-- Styles additionnels pour la recherche et les notifications -->
+    <!-- Styles pour la recherche et les notifications - VERSION AMÉLIORÉE -->
     <style>
-        /* Styles pour les suggestions de recherche */
+        /* ============================================
+           STYLES POUR LES SUGGESTIONS DE RECHERCHE
+           ============================================ */
         .search-container {
             position: relative;
             display: inline-block;
@@ -35,6 +37,7 @@
             padding: 12px;
             cursor: pointer;
             border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
         }
         
         .suggestion-item:hover {
@@ -44,167 +47,497 @@
         .suggestion-item:last-child {
             border-bottom: none;
         }
-        
-        /* Styles pour les résultats de recherche */
+
+        /* ============================================
+           CONTENEUR PRINCIPAL DES RÉSULTATS DE RECHERCHE
+           ============================================ */
         #search-results {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
+            height: 100vh;
+            background: rgba(0,0,0,0.95);
             z-index: 1000;
             overflow-y: auto;
             padding: 20px;
             box-sizing: border-box;
         }
         
+        /* En-tête des résultats */
         .search-results-header {
             color: white;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 0 20px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
         }
         
+        .search-results-header h2 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 300;
+            color: #ffffff;
+        }
+        
+        /* Grille des résultats - OPTIMISÉE */
         .search-results-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
         
+        /* ============================================
+           CARTES DE PLANTES - DESIGN MODERNE
+           ============================================ */
         .plant-card {
             background: white;
-            border-radius: 12px;
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideInUp 0.6s ease forwards;
         }
         
         .plant-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-12px) scale(1.03);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.25);
         }
         
+        /* Conteneur d'image amélioré */
         .plant-image-container {
-            height: 200px;
-            background: #f5f5f5;
+            height: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
+            overflow: hidden;
+        }
+        
+        .plant-image-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(0,0,0,0.1) 0%, transparent 50%);
+            z-index: 1;
         }
         
         .plant-image-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.4s ease;
+            position: relative;
+            z-index: 2;
         }
         
+        .plant-card:hover .plant-image-container img {
+            transform: scale(1.1);
+        }
+        
+        /* Badge de stock moderne */
+        .stock-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 600;
+            color: white;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .stock-badge.available {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+        
+        .stock-badge.low-stock {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+        }
+        
+        .stock-badge.out-of-stock {
+            background: linear-gradient(135deg, #F44336, #D32F2F);
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4);
+        }
+        
+        /* ============================================
+           INFORMATIONS DE LA PLANTE
+           ============================================ */
         .plant-info {
-            padding: 16px;
+            padding: 30px;
+            background: white;
         }
         
         .plant-name {
-            margin: 0 0 8px 0;
-            color: #333;
-            font-size: 16px;
-            font-weight: bold;
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
         }
         
         .plant-scientific {
-            color: #666;
+            color: #7f8c8d;
             font-style: italic;
-            margin: 0 0 8px 0;
-            font-size: 14px;
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            opacity: 0.8;
+            font-weight: 400;
         }
         
         .plant-description {
-            color: #666;
-            font-size: 14px;
-            margin: 0 0 12px 0;
-            line-height: 1.4;
+            color: #555;
+            font-size: 15px;
+            margin: 0 0 25px 0;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
         
+        /* Détails prix et stock */
         .plant-details {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            margin-bottom: 25px;
+            padding: 20px 0;
+            border-top: 2px solid #ecf0f1;
+            border-bottom: 2px solid #ecf0f1;
         }
         
         .plant-price {
-            font-size: 18px;
-            font-weight: bold;
-            color: #2196F3;
+            font-size: 28px;
+            font-weight: 800;
+            color: #27ae60;
+            position: relative;
+        }
+        
+        .plant-price::before {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            border-radius: 2px;
         }
         
         .plant-stock {
-            font-size: 12px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .stock-available {
-            color: #4CAF50;
+            color: #27ae60;
+            background: rgba(39, 174, 96, 0.1);
+            border: 1px solid rgba(39, 174, 96, 0.3);
+        }
+        
+        .stock-low {
+            color: #f39c12;
+            background: rgba(243, 156, 18, 0.1);
+            border: 1px solid rgba(243, 156, 18, 0.3);
         }
         
         .stock-unavailable {
-            color: #f44336;
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.3);
         }
         
+        /* Catégorie stylisée */
         .plant-category {
-            color: #999;
-            font-size: 12px;
-            margin: 8px 0 0 0;
+            color: #95a5a6;
+            font-size: 13px;
+            margin: 0 0 25px 0;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #ecf0f1, #bdc3c7);
+            border-radius: 25px;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
         }
         
+        .plant-category::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.6s;
+        }
+        
+        .plant-card:hover .plant-category::before {
+            left: 100%;
+        }
+        
+        /* ============================================
+           BOUTON D'AJOUT AU PANIER - ULTRA MODERNE
+           ============================================ */
         .add-to-cart-btn {
             width: 100%;
-            padding: 10px;
-            background: #4CAF50;
+            padding: 18px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 15px;
             cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s;
+            font-size: 18px;
+            font-weight: 700;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .add-to-cart-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .add-to-cart-btn:hover::before {
+            left: 100%;
         }
         
         .add-to-cart-btn:hover {
-            background: #45a049;
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+        
+        .add-to-cart-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
         }
         
         .add-to-cart-btn:disabled {
-            background: #ccc;
+            background: linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%);
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         
+        .add-to-cart-btn:disabled::before {
+            display: none;
+        }
+        
+        /* ============================================
+           BOUTON FERMER AMÉLIORÉ
+           ============================================ */
         .close-btn {
-            background: #f44336;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
+            padding: 15px 30px;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
         }
         
         .close-btn:hover {
-            background: #d32f2f;
+            background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
         }
         
-        /* Notification toast */
+        /* ============================================
+           MESSAGE "AUCUN RÉSULTAT"
+           ============================================ */
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 80px 40px;
+            color: white;
+        }
+        
+        .no-results h3 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            font-weight: 300;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .no-results p {
+            font-size: 18px;
+            opacity: 0.9;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* ============================================
+           ANIMATIONS
+           ============================================ */
+        @keyframes slideInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .plant-card:nth-child(1) { animation-delay: 0.1s; }
+        .plant-card:nth-child(2) { animation-delay: 0.2s; }
+        .plant-card:nth-child(3) { animation-delay: 0.3s; }
+        .plant-card:nth-child(4) { animation-delay: 0.4s; }
+        .plant-card:nth-child(5) { animation-delay: 0.5s; }
+        .plant-card:nth-child(6) { animation-delay: 0.6s; }
+        
+        /* Loading spinner amélioré */
+        .loading-spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* ============================================
+           RESPONSIVE DESIGN
+           ============================================ */
+        @media (max-width: 768px) {
+            .search-results-grid {
+                grid-template-columns: 1fr;
+                gap: 25px;
+                padding: 0 15px;
+            }
+            
+            .plant-image-container {
+                height: 250px;
+            }
+            
+            .plant-info {
+                padding: 25px;
+            }
+            
+            .search-results-header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+                padding: 0 15px;
+            }
+            
+            .search-results-header h2 {
+                font-size: 24px;
+            }
+            
+            .plant-name {
+                font-size: 20px;
+            }
+            
+            .plant-price {
+                font-size: 24px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #search-results {
+                padding: 15px;
+            }
+            
+            .plant-image-container {
+                height: 220px;
+            }
+            
+            .plant-info {
+                padding: 20px;
+            }
+            
+            .plant-name {
+                font-size: 18px;
+            }
+            
+            .plant-price {
+                font-size: 22px;
+            }
+            
+            .add-to-cart-btn {
+                padding: 15px 20px;
+                font-size: 16px;
+            }
+        }
+        
+        /* ============================================
+           NOTIFICATIONS TOAST AMÉLIORÉES
+           ============================================ */
         .toast {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: #4CAF50;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
             color: white;
-            padding: 12px 24px;
-            border-radius: 6px;
+            padding: 15px 25px;
+            border-radius: 12px;
             z-index: 2000;
             opacity: 0;
             transform: translateX(100%);
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+            font-weight: 600;
+            max-width: 350px;
         }
         
         .toast.show {
@@ -213,22 +546,19 @@
         }
         
         .toast.error {
-            background: #f44336;
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            box-shadow: 0 8px 25px rgba(244, 67, 54, 0.3);
         }
         
-        /* Animation de chargement */
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
+        /* Animation pour le stock mis à jour */
+        .stock-updated {
+            animation: stockPulse 0.6s ease-in-out;
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        @keyframes stockPulse {
+            0% { transform: scale(1); background-color: transparent; }
+            50% { transform: scale(1.05); background-color: rgba(255, 235, 59, 0.3); }
+            100% { transform: scale(1); background-color: transparent; }
         }
     </style>
 </head>
@@ -263,80 +593,83 @@
     <div id="search-results">
         <div class="search-results-header">
             <h2>Résultats de recherche</h2>
-            <button id="close-search" class="close-btn">✕ Fermer</button>
+            <button id="close-search" class="close-btn">
+                <i class="fas fa-times"></i>
+                Fermer
+            </button>
         </div>
         <div class="search-results-grid" id="results-grid">
             <!-- Les résultats apparaîtront ici -->
         </div>
     </div>
 
-    <!-- Section des plantes existante -->
+    <!-- Section des plantes avec stock dynamique -->
     <section class="les-plantes">
         <nav class="plantes">
-            <div class="plant1">
+            <div class="plant1" data-plant-name="Zamioculcas zamiifolia">
                 <img src="../Plants/1st plant.jpg" alt="plant" width="150px" height="260px">
                 <h5 style="color: rgb(40, 167, 199); font-size: 20px"> 199.99 DH <s style="color: gray; font-size: 15px;">299.99 DH</s></h5>
                 <h4>Zamioculcas zamiifolia</h4>
-                <h3 style="font-size: 13px; font-weight: 390;">Quantity in stock : 24</h3>
-                <button onclick="addToCart('Zamioculcas zamiifolia', 199.99)">Add to cart</button>
+                <h3 class="stock-display" style="font-size: 13px; font-weight: 390;">Quantity in stock : <span class="stock-number">32</span></h3>
+                <button onclick="addToCartWithUpdate('Zamioculcas zamiifolia', 199.99, this)">Add to cart</button>
             </div>
             
-            <div class="plant2">
+            <div class="plant2" data-plant-name="Aglaonema">
                 <img src="../Plants/plante4.jpg" alt="plant" width="150px" height="260">
                 <h5 style="color: rgb(46, 43, 43); font-size: 20px">150.00 DH</h5>                
                 <h4>Aglaonema</h4>
-                <h3 style="font-size: 13px; font-weight: 390;">Quantity in stock : 32</h3> 
-                <button onclick="addToCart('Aglaonema', 150.00)">Add to cart</button>
+                <h3 class="stock-display" style="font-size: 13px; font-weight: 390;">Quantity in stock : <span class="stock-number">17</span></h3> 
+                <button onclick="addToCartWithUpdate('Aglaonema', 150.00, this)">Add to cart</button>
             </div>
 
-            <div class="plant3">
+            <div class="plant3" data-plant-name="Philodendron Xanadu">
                 <img src="../Plants/plante3.jpg" alt="plant" width="150px" height="260">
                 <h5 style="color: rgb(40, 167, 199); font-size: 20px">50.00 DH <s style="color: gray; font-size: 15px;">99.99 DH</s></h5>
                 <h4>Philodendron Xanadu</h4>
-                <h3 style="font-size: 13px; font-weight: 390;">Quantity in stock : 17</h3>  
-                <button onclick="addToCart('Philodendron Xanadu', 50.00)">Add to cart</button>
+                <h3 class="stock-display" style="font-size: 13px; font-weight: 390;">Quantity in stock : <span class="stock-number">45</span></h3>  
+                <button onclick="addToCartWithUpdate('Philodendron Xanadu', 50.00, this)">Add to cart</button>
             </div>
             
-            <div class="plant4">
+            <div class="plant4" data-plant-name="Sansevieria trifasciata">
                 <img src="../Plants/plant5.jpg" alt="plant" width="150px" height="260">
                 <h5 style="color: rgb(46, 43, 43); font-size: 20px">179.99 DH</h5>
                 <h4>Sansevieria trifasciata</h4>
-                <h3 style="font-size: 13px; font-weight: 390;">Quantity in stock : 24</h3>
-                <button onclick="addToCart('Sansevieria trifasciata', 179.99)">Add to cart</button>
+                <h3 class="stock-display" style="font-size: 13px; font-weight: 390;">Quantity in stock : <span class="stock-number">6</span></h3>
+                <button onclick="addToCartWithUpdate('Sansevieria trifasciata', 179.99, this)">Add to cart</button>
             </div>
         </nav><br><br>
         
         <nav class="plantes">
-            <div class="plant1">
+            <div class="plant1" data-plant-name="Zamioculcas zamiifolia">
                 <img src="../Plants/1st plant.jpg" alt="plant" width="150px" height="260px">
                 <h5 style="color: rgb(40, 167, 199); font-size: 20px">199.99 DH <s style="color: gray; font-size: 15px;">299.99 DH</s></h5>
                 <h4>Zamioculcas zamiifolia</h4>
-                <h3 style="font-size: 13px; font-weight: 390;">Quantity in stock : 32</h3>
-                <button onclick="addToCart('Zamioculcas zamiifolia', 199.99)">Add to cart</button>
+                <h3 class="stock-display" style="font-size: 13px; font-weight: 390;">Quantity in stock : <span class="stock-number">32</span></h3>
+                <button onclick="addToCartWithUpdate('Zamioculcas zamiifolia', 199.99, this)">Add to cart</button>
             </div>
             
-            <div class="plant2">
+            <div class="plant2" data-plant-name="Aglaonema">
                 <img src="../Plants/plante4.jpg" alt="plant" width="150px" height="260">
                 <h5 style="color: rgb(46, 43, 43); font-size: 20px">150.00 DH</h5>                
                 <h4>Aglaonema</h4>
-                <h3 style="font-size: 13px; font-weight: 390;">Quantity in stock : 17</h3>
-                <button onclick="addToCart('Aglaonema', 150.00)">Add to cart</button>
+                <h3 class="stock-display" style="font-size: 13px; font-weight: 390;">Quantity in stock : <span class="stock-number">17</span></h3>
+                <button onclick="addToCartWithUpdate('Aglaonema', 150.00, this)">Add to cart</button>
             </div>
 
-            <div class="plant3">
+            <div class="plant3" data-plant-name="Philodendron Xanadu">
                 <img src="../Plants/plante3.jpg" alt="plant" width="150px" height="260">
                 <h5 style="color: rgb(40, 167, 199); font-size: 20px">50.00 DH <s style="color: gray; font-size: 15px;">99.99 DH</s></h5>
                 <h4>Philodendron Xanadu</h4>
-                <h3 style="font-size: 13px; font-weight: 390;">Quantity in stock : 45</h3>  
-                <button onclick="addToCart('Philodendron Xanadu', 50.00)">Add to cart</button>
+                <h3 class="stock-display" style="font-size: 13px; font-weight: 390;">Quantity in stock : <span class="stock-number">45</span></h3>  
+                <button onclick="addToCartWithUpdate('Philodendron Xanadu', 50.00, this)">Add to cart</button>
             </div>
             
-            <div class="plant4">
+            <div class="plant4" data-plant-name="Sansevieria trifasciata">
                 <img src="../Plants/plant5.jpg" alt="plant" width="150px" height="260">
                 <h5 style="color: rgb(46, 43, 43); font-size: 20px">179.99 DH</h5>
                 <h4>Sansevieria trifasciata</h4>
-                <h3 style="font-size: 13px; font-weight: 390;">Quantity in stock : 6</h3>
-                <button onclick="addToCart('Sansevieria trifasciata', 179.99)">Add to cart</button>
+                <h3 class="stock-display" style="font-size: 13px; font-weight: 390;">Quantity in stock : <span class="stock-number">6</span></h3>
+                <button onclick="addToCartWithUpdate('Sansevieria trifasciata', 179.99, this)">Add to cart</button>
             </div>
         </nav>
     </section><br><br><br><br>
@@ -346,250 +679,7 @@
 
     <script>
         // ============================================
-        // SYSTÈME DE RECHERCHE COMPLET
-        // ============================================
-        
-        class PlantSearchSystem {
-            constructor() {
-                this.searchInput = null;
-                this.suggestionsContainer = null;
-                this.resultsContainer = null;
-                this.currentQuery = '';
-                this.searchTimeout = null;
-                
-                this.init();
-            }
-            
-            init() {
-                // Attendre que le DOM soit chargé
-                if (document.readyState === 'loading') {
-                    document.addEventListener('DOMContentLoaded', () => this.setupSearch());
-                } else {
-                    this.setupSearch();
-                }
-            }
-            
-            setupSearch() {
-                // Trouver les éléments
-                this.searchInput = document.getElementById('search-input');
-                this.suggestionsContainer = document.getElementById('search-suggestions');
-                this.resultsContainer = document.getElementById('search-results');
-                
-                if (!this.searchInput) {
-                    console.error('❌ Barre de recherche non trouvée');
-                    return;
-                }
-                
-                console.log('✅ Système de recherche initialisé');
-                
-                // Ajouter les écouteurs d'événements
-                this.addEventListeners();
-            }
-            
-            addEventListeners() {
-                // Recherche en temps réel avec suggestions
-                this.searchInput.addEventListener('input', (e) => {
-                    const query = e.target.value.trim();
-                    
-                    // Annuler la recherche précédente
-                    if (this.searchTimeout) {
-                        clearTimeout(this.searchTimeout);
-                    }
-                    
-                    // Suggestions après 300ms
-                    if (query.length >= 2) {
-                        this.searchTimeout = setTimeout(() => {
-                            this.getSuggestions(query);
-                        }, 300);
-                    } else {
-                        this.hideSuggestions();
-                    }
-                });
-                
-                // Recherche à l'appui sur Entrée
-                this.searchInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const query = e.target.value.trim();
-                        if (query.length > 0) {
-                            this.performSearch(query);
-                        }
-                    }
-                });
-                
-                // Fermer les suggestions quand on clique ailleurs
-                document.addEventListener('click', (e) => {
-                    if (!this.searchInput.contains(e.target) && 
-                        !this.suggestionsContainer.contains(e.target)) {
-                        this.hideSuggestions();
-                    }
-                });
-                
-                // Bouton fermer des résultats
-                document.getElementById('close-search').addEventListener('click', () => {
-                    this.hideResults();
-                });
-                
-                // Fermer avec Escape
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape') {
-                        this.hideResults();
-                        this.hideSuggestions();
-                    }
-                });
-            }
-            
-            async getSuggestions(query) {
-                try {
-                    const response = await fetch(`/api/search/suggestions?query=${encodeURIComponent(query)}`);
-                    const data = await response.json();
-                    
-                    if (data.success && data.suggestions.length > 0) {
-                        this.showSuggestions(data.suggestions);
-                    } else {
-                        this.hideSuggestions();
-                    }
-                } catch (error) {
-                    console.error('❌ Erreur suggestions:', error);
-                    this.hideSuggestions();
-                }
-            }
-            
-            showSuggestions(suggestions) {
-                const suggestionsHTML = suggestions.map(suggestion => `
-                    <div class="suggestion-item" data-name="${suggestion.name}">
-                        <strong>${suggestion.name}</strong>
-                        ${suggestion.scientificName ? `<br><small style="color: #666;">${suggestion.scientificName}</small>` : ''}
-                    </div>
-                `).join('');
-                
-                this.suggestionsContainer.innerHTML = suggestionsHTML;
-                this.suggestionsContainer.style.display = 'block';
-                
-                // Ajouter les écouteurs sur les suggestions
-                this.suggestionsContainer.querySelectorAll('.suggestion-item').forEach(item => {
-                    item.addEventListener('click', () => {
-                        const plantName = item.dataset.name;
-                        this.searchInput.value = plantName;
-                        this.hideSuggestions();
-                        this.performSearch(plantName);
-                    });
-                });
-            }
-            
-            hideSuggestions() {
-                this.suggestionsContainer.style.display = 'none';
-            }
-            
-            async performSearch(query) {
-                console.log('🔍 Recherche pour:', query);
-                this.currentQuery = query;
-                this.hideSuggestions();
-                
-                try {
-                    // Afficher un indicateur de chargement
-                    this.showLoadingResults();
-                    
-                    const response = await fetch(`/api/search/plants?query=${encodeURIComponent(query)}`);
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        this.showResults(data);
-                    } else {
-                        this.showError('Erreur lors de la recherche');
-                    }
-                } catch (error) {
-                    console.error('❌ Erreur recherche:', error);
-                    this.showError('Erreur de connexion au serveur');
-                }
-            }
-            
-            showLoadingResults() {
-                const grid = document.getElementById('results-grid');
-                grid.innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: white;">
-                        <div class="loading-spinner"></div>
-                        <p style="margin-top: 16px;">Recherche en cours...</p>
-                    </div>
-                `;
-                this.resultsContainer.style.display = 'block';
-            }
-            
-            showResults(data) {
-                const grid = document.getElementById('results-grid');
-                
-                if (data.plants.length === 0) {
-                    grid.innerHTML = `
-                        <div style="text-align: center; padding: 40px; color: white; grid-column: 1 / -1;">
-                            <div style="font-size: 48px; margin-bottom: 20px;">🌱</div>
-                            <h3>Aucune plante trouvée</h3>
-                            <p>Essayez avec d'autres mots-clés pour "${this.currentQuery}"</p>
-                        </div>
-                    `;
-                } else {
-                    const plantsHTML = data.plants.map(plant => this.createPlantCard(plant)).join('');
-                    grid.innerHTML = `
-                        <div style="color: white; margin-bottom: 20px; grid-column: 1 / -1;">
-                            <h3>${data.totalResults} résultat(s) pour "${this.currentQuery}"</h3>
-                        </div>
-                        ${plantsHTML}
-                    `;
-                }
-                
-                this.resultsContainer.style.display = 'block';
-            }
-            
-            createPlantCard(plant) {
-                return `
-                    <div class="plant-card">
-                        <div class="plant-image-container">
-                            ${plant.imageUrl ? 
-                                `<img src="${plant.imageUrl}" alt="${plant.name}">` :
-                                `<div style="font-size: 48px; color: #ccc;">🌱</div>`
-                            }
-                        </div>
-                        <div class="plant-info">
-                            <h4 class="plant-name">${plant.name}</h4>
-                            ${plant.scientificName ? `<p class="plant-scientific">${plant.scientificName}</p>` : ''}
-                            <p class="plant-description">${plant.description ? plant.description.substring(0, 100) + '...' : 'Description non disponible'}</p>
-                            <div class="plant-details">
-                                <span class="plant-price">${plant.price} DH</span>
-                                <span class="plant-stock ${plant.stockQuantity > 0 ? 'stock-available' : 'stock-unavailable'}">
-                                    ${plant.stockQuantity > 0 ? `${plant.stockQuantity} en stock` : 'Rupture de stock'}
-                                </span>
-                            </div>
-                            ${plant.category ? `<p class="plant-category">Catégorie: ${plant.category}</p>` : ''}
-                            <button class="add-to-cart-btn" 
-                                    onclick="addToCartFromSearch('${plant.name}', ${plant.price})"
-                                    ${plant.stockQuantity <= 0 ? 'disabled' : ''}>
-                                ${plant.stockQuantity > 0 ? 'Ajouter au panier' : 'Indisponible'}
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            showError(message) {
-                const grid = document.getElementById('results-grid');
-                grid.innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: white; grid-column: 1 / -1;">
-                        <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
-                        <h3>Erreur</h3>
-                        <p>${message}</p>
-                    </div>
-                `;
-                this.resultsContainer.style.display = 'block';
-            }
-            
-            hideResults() {
-                this.resultsContainer.style.display = 'none';
-                this.searchInput.value = '';
-                this.currentQuery = '';
-            }
-        }
-
-        // ============================================
-        // SYSTÈME DE PANIER AMÉLIORÉ
+        // SYSTÈME DE PANIER AVEC GESTION DU STOCK
         // ============================================
         
         class CartSystem {
@@ -610,7 +700,7 @@
                 if (savedCart) {
                     try {
                         this.cartItems = JSON.parse(savedCart);
-                        this.cartCount = this.cartItems.reduce((total, item) => total + (item.quantity || 1), 0);
+                        this.cartCount = this.cartItems.reduce((total, item) => total + (item.quantité || 1), 0);
                     } catch (error) {
                         console.error('Erreur lors du chargement du panier:', error);
                         this.cartItems = [];
@@ -621,61 +711,6 @@
             
             saveCart() {
                 localStorage.setItem('cart', JSON.stringify(this.cartItems));
-            }
-            
-            addItem(plantName, price) {
-                // Vérifier si l'article existe déjà
-                const existingItem = this.cartItems.find(item => item.name === plantName);
-                
-                if (existingItem) {
-                    existingItem.quantity = (existingItem.quantity || 1) + 1;
-                } else {
-                    this.cartItems.push({
-                        name: plantName,
-                        price: price,
-                        quantity: 1,
-                        addedAt: new Date().toISOString()
-                    });
-                }
-                
-                this.cartCount++;
-                this.saveCart();
-                this.updateCartDisplay();
-                
-                // Envoyer à l'API si besoin
-                this.syncWithServer(plantName);
-                
-                // Afficher une notification
-                this.showNotification(`${plantName} ajouté au panier`, 'success');
-                
-                console.log('🛒 Article ajouté:', plantName, 'Total articles:', this.cartCount);
-            }
-            
-            async syncWithServer(plantName) {
-                try {
-                    const response = await fetch('/api/cart/add', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            plantName: plantName,
-                            quantity: 1
-                            // userId: currentUser?.id // Si l'utilisateur est connecté
-                        })
-                    });
-                    
-                    const data = await response.json();
-                    if (!data.success) {
-                        console.warn('Avertissement serveur:', data.message);
-                        if (data.message.includes('Stock insuffisant')) {
-                            this.showNotification(data.message, 'error');
-                        }
-                    }
-                } catch (error) {
-                    console.warn('Erreur de synchronisation avec le serveur:', error);
-                    // Continuer en mode local
-                }
             }
             
             updateCartDisplay() {
@@ -705,139 +740,483 @@
                         if (toast.parentNode) {
                             toast.parentNode.removeChild(toast);
                         }
-                    }, 300);
+                    }, 400);
                 }, 3000);
             }
         }
 
+        // Initialiser le système de panier
+        const cartSystem = new CartSystem();
+
+        // ============================================
+        // FONCTION D'AJOUT AU PANIER AVEC MISE À JOUR DU STOCK
+        // ============================================
+        
+        async function addToCartWithUpdate(plantName, price, buttonElement) {
+            try {
+                console.log('🛒 Ajout au panier:', plantName);
+                
+                // 1. Mettre à jour le stock côté serveur
+                const response = await fetch('http://localhost:3000/plantes/stock', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        nom: plantName, 
+                        action: 'decrease',
+                        quantity: 1 
+                    }),
+                });
+
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    cartSystem.showNotification(result.error || 'Erreur lors de l\'ajout au panier', 'error');
+                    return;
+                }
+
+                // 2. Mettre à jour le panier local
+                const existingItem = cartSystem.cartItems.find(item => item.nom === plantName);
+                
+                if (existingItem) {
+                    existingItem.quantité += 1;
+                } else {
+                    cartSystem.cartItems.push({
+                        nom: plantName,
+                        prix: price,
+                        quantité: 1
+                    });
+                }
+                
+                cartSystem.cartCount++;
+                cartSystem.saveCart();
+                cartSystem.updateCartDisplay();
+
+                // 3. Mettre à jour l'affichage du stock sur la page
+                updateStockDisplay(plantName, result.newStock);
+                
+                cartSystem.showNotification(`${plantName} ajouté au panier !`, 'success');
+                console.log('✅ Stock mis à jour:', result.newStock);
+                
+            } catch (error) {
+                console.error('❌ Erreur lors de l\'ajout au panier:', error);
+                cartSystem.showNotification('Erreur de connexion au serveur', 'error');
+            }
+        }
+
+        // ============================================
+        // FONCTION DE MISE À JOUR DE L'AFFICHAGE DU STOCK
+        // ============================================
+        
+        function updateStockDisplay(plantName, newStock) {
+            // Trouver tous les éléments correspondant à cette plante
+            const plantElements = document.querySelectorAll(`[data-plant-name="${plantName}"]`);
+            
+            plantElements.forEach(plantElement => {
+                const stockElement = plantElement.querySelector('.stock-number');
+                if (stockElement) {
+                    // Mettre à jour le nombre
+                    stockElement.textContent = newStock;
+                    
+                    // Ajouter une animation pour indiquer le changement
+                    const stockDisplay = plantElement.querySelector('.stock-display');
+                    stockDisplay.classList.add('stock-updated');
+                    
+                    // Retirer l'animation après 600ms
+                    setTimeout(() => {
+                        stockDisplay.classList.remove('stock-updated');
+                    }, 600);
+                    
+                    // Désactiver le bouton si stock = 0
+                    const button = plantElement.querySelector('button');
+                    if (newStock <= 0) {
+                        button.disabled = true;
+                        button.textContent = 'Out of stock';
+                        button.style.background = '#ccc';
+                    }
+                }
+            });
+        }
+
+        // ============================================
+        // FONCTION LEGACY POUR COMPATIBILITÉ
+        // ============================================
+        
+        function addToCart(plantName, price) {
+            // Rediriger vers la nouvelle fonction
+            addToCartWithUpdate(plantName, price, null);
+        }
+
+        // ============================================
+        // SYSTÈME DE RECHERCHE AVEC SUGGESTIONS - AMÉLIORÉ
+        // ============================================
+        
+        class SearchSystem {
+            constructor() {
+                this.searchInput = document.getElementById('search-input');
+                this.suggestionsContainer = document.getElementById('search-suggestions');
+                this.searchResults = document.getElementById('search-results');
+                this.resultsGrid = document.getElementById('results-grid');
+                this.closeBtn = document.getElementById('close-search');
+                this.debounceTimer = null;
+                this.init();
+            }
+            
+            init() {
+                // Événements de recherche
+                this.searchInput.addEventListener('input', (e) => {
+                    this.handleSearchInput(e.target.value);
+                });
+                
+                this.searchInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.performSearch(e.target.value);
+                    }
+                });
+                
+                // Fermer les suggestions quand on clique ailleurs
+                document.addEventListener('click', (e) => {
+                    if (!this.searchInput.contains(e.target) && !this.suggestionsContainer.contains(e.target)) {
+                        this.hideSuggestions();
+                    }
+                });
+                
+                // Bouton fermer les résultats
+                this.closeBtn.addEventListener('click', () => {
+                    this.hideResults();
+                });
+                
+                // Fermer avec Escape
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        this.hideResults();
+                        this.hideSuggestions();
+                    }
+                });
+            }
+            
+            handleSearchInput(query) {
+                // Annuler le timer précédent
+                if (this.debounceTimer) {
+                    clearTimeout(this.debounceTimer);
+                }
+                
+                // Attendre 300ms avant de chercher
+                this.debounceTimer = setTimeout(() => {
+                    if (query.trim().length >= 2) {
+                        this.getSuggestions(query);
+                    } else {
+                        this.hideSuggestions();
+                    }
+                }, 300);
+            }
+            
+            async getSuggestions(query) {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/search/suggestions?query=${encodeURIComponent(query)}`);
+                    const data = await response.json();
+                    
+                    if (data.success && data.suggestions.length > 0) {
+                        this.showSuggestions(data.suggestions);
+                    } else {
+                        this.hideSuggestions();
+                    }
+                } catch (error) {
+                    console.error('Erreur lors de la récupération des suggestions:', error);
+                    this.hideSuggestions();
+                }
+            }
+            
+            showSuggestions(suggestions) {
+                this.suggestionsContainer.innerHTML = '';
+                
+                suggestions.forEach(suggestion => {
+                    const item = document.createElement('div');
+                    item.className = 'suggestion-item';
+                    item.textContent = suggestion.displayText;
+                    
+                    item.addEventListener('click', () => {
+                        this.searchInput.value = suggestion.name;
+                        this.hideSuggestions();
+                        this.performSearch(suggestion.name);
+                    });
+                    
+                    this.suggestionsContainer.appendChild(item);
+                });
+                
+                this.suggestionsContainer.style.display = 'block';
+            }
+            
+            hideSuggestions() {
+                this.suggestionsContainer.style.display = 'none';
+            }
+            
+            async performSearch(query) {
+                if (!query.trim()) return;
+                
+                this.hideSuggestions();
+                this.showResults();
+                this.showLoadingResults();
+                
+                try {
+                    const response = await fetch(`http://localhost:3000/api/search/plants?query=${encodeURIComponent(query)}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.displaySearchResults(data.plants, query);
+                    } else {
+                        this.showNoResults(query);
+                    }
+                } catch (error) {
+                    console.error('Erreur lors de la recherche:', error);
+                    this.showSearchError();
+                }
+            }
+            
+            showResults() {
+                this.searchResults.style.display = 'block';
+                document.body.style.overflow = 'hidden'; // Empêcher le scroll du body
+            }
+            
+            hideResults() {
+                this.searchResults.style.display = 'none';
+                document.body.style.overflow = 'auto'; // Rétablir le scroll
+            }
+            
+            showLoadingResults() {
+                this.resultsGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 80px 40px; color: white;">
+                        <div class="loading-spinner" style="margin: 0 auto 20px;"></div>
+                        <h3 style="font-size: 24px; margin: 0; font-weight: 300;">Recherche en cours...</h3>
+                        <p style="margin: 10px 0 0 0; opacity: 0.8;">Veuillez patienter</p>
+                    </div>
+                `;
+            }
+            
+            // ============================================
+            // FONCTION CORRIGÉE POUR L'AFFICHAGE DES RÉSULTATS
+            // ============================================
+            displaySearchResults(plants, query) {
+                if (plants.length === 0) {
+                    this.showNoResults(query);
+                    return;
+                }
+                
+                const plantsHTML = plants.map(plant => {
+                    // CORRECTION: Vérifier et formater le stock correctement
+                    const stockQuantity = plant.stockQuantity || plant.stock_quantity || 0;
+                    const isAvailable = stockQuantity > 0;
+                    const stockClass = stockQuantity > 10 ? 'stock-available' : 
+                                      stockQuantity > 0 ? 'stock-low' : 'stock-unavailable';
+                    const stockText = stockQuantity > 0 ? `${stockQuantity} en stock` : 'Rupture de stock';
+                    
+                    // CORRECTION: Vérifier l'image
+                    const imageUrl = plant.imageUrl || plant.image_url || '/Plants/default.jpg';
+                    
+                    // CORRECTION: Badge de stock dynamique
+                    const stockBadgeClass = stockQuantity > 10 ? 'available' : 
+                                           stockQuantity > 0 ? 'low-stock' : 'out-of-stock';
+                    const stockBadgeText = stockQuantity > 10 ? 'En Stock' : 
+                                          stockQuantity > 0 ? 'Stock Limité' : 'Épuisé';
+                    
+                    return `
+                        <div class="plant-card">
+                            <div class="plant-image-container">
+                                <img src="${imageUrl}" alt="${plant.name}" onerror="this.src='/Plants/default.jpg'">
+                                <div class="stock-badge ${stockBadgeClass}">
+                                    ${stockBadgeText}
+                                </div>
+                            </div>
+                            <div class="plant-info">
+                                <h3 class="plant-name">${plant.name}</h3>
+                                ${plant.scientificName ? `<p class="plant-scientific">${plant.scientificName}</p>` : ''}
+                                <p class="plant-description">${plant.description || 'Description non disponible'}</p>
+                                
+                                ${plant.category ? `<span class="plant-category">${plant.category}</span>` : ''}
+                                
+                                <div class="plant-details">
+                                    <span class="plant-price">${plant.price} DH</span>
+                                    <span class="plant-stock ${stockClass}">
+                                        ${stockText}
+                                    </span>
+                                </div>
+                                
+                                <button class="add-to-cart-btn" 
+                                        onclick="addToCartFromSearch('${plant.name}', ${plant.price}, this)"
+                                        ${!isAvailable ? 'disabled' : ''}>
+                                    ${!isAvailable ? '❌ Rupture de stock' : '🛒 Ajouter au panier'}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                this.resultsGrid.innerHTML = plantsHTML;
+                
+                // Mettre à jour le titre avec le nombre de résultats
+                const headerTitle = document.querySelector('.search-results-header h2');
+                headerTitle.textContent = `${plants.length} résultat${plants.length > 1 ? 's' : ''} pour "${query}"`;
+            }
+            
+            showNoResults(query) {
+                this.resultsGrid.innerHTML = `
+                    <div class="no-results">
+                        <h3>🔍 Aucun résultat trouvé</h3>
+                        <p>Aucune plante ne correspond à votre recherche "<strong>${query}</strong>"</p>
+                        <p style="margin-top: 20px; opacity: 0.8;">
+                            💡 Essayez avec des termes différents ou parcourez notre catalogue complet.
+                        </p>
+                    </div>
+                `;
+            }
+            
+            showSearchError() {
+                this.resultsGrid.innerHTML = `
+                    <div class="no-results">
+                        <h3>⚠️ Erreur de recherche</h3>
+                        <p>Une erreur est survenue lors de la recherche. Veuillez réessayer.</p>
+                        <p style="margin-top: 20px; opacity: 0.8;">
+                            🔄 Vérifiez votre connexion internet
+                        </p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Initialiser le système de recherche
+        const searchSystem = new SearchSystem();
+        
+        // ============================================
+        // FONCTION CORRIGÉE POUR AJOUTER AU PANIER DEPUIS LA RECHERCHE
+        // ============================================
+        
+        async function addToCartFromSearch(plantName, price, buttonElement) {
+            try {
+                console.log('🛒 Ajout au panier depuis la recherche:', plantName);
+                
+                // Désactiver temporairement le bouton avec feedback visuel
+                const originalText = buttonElement.innerHTML;
+                buttonElement.disabled = true;
+                buttonElement.innerHTML = '<div class="loading-spinner"></div> Ajout en cours...';
+                
+                // Utiliser la même fonction que les plantes principales
+                await addToCartWithUpdate(plantName, price, buttonElement);
+                
+                // Mettre à jour le stock dans les résultats de recherche
+                const plantCard = buttonElement.closest('.plant-card');
+                const stockSpan = plantCard.querySelector('.plant-stock');
+                const stockBadge = plantCard.querySelector('.stock-badge');
+                
+                if (stockSpan) {
+                    // Extraire le nombre actuel du stock
+                    const currentStockText = stockSpan.textContent;
+                    const currentStockMatch = currentStockText.match(/\d+/);
+                    
+                    if (currentStockMatch) {
+                        const currentStock = parseInt(currentStockMatch[0]);
+                        const newStock = Math.max(0, currentStock - 1);
+                        
+                        // Mettre à jour l'affichage du stock
+                        if (newStock > 0) {
+                            stockSpan.textContent = `${newStock} en stock`;
+                            stockSpan.className = newStock > 10 ? 'plant-stock stock-available' : 'plant-stock stock-low';
+                            
+                            // Mettre à jour le badge
+                            if (stockBadge) {
+                                stockBadge.textContent = newStock > 10 ? 'En Stock' : 'Stock Limité';
+                                stockBadge.className = newStock > 10 ? 'stock-badge available' : 'stock-badge low-stock';
+                            }
+                            
+                            // Rétablir le bouton
+                            buttonElement.disabled = false;
+                            buttonElement.innerHTML = '🛒 Ajouter au panier';
+                        } else {
+                            stockSpan.textContent = 'Rupture de stock';
+                            stockSpan.className = 'plant-stock stock-unavailable';
+                            
+                            // Désactiver définitivement le bouton
+                            buttonElement.disabled = true;
+                            buttonElement.innerHTML = '❌ Rupture de stock';
+                            
+                            // Mettre à jour le badge
+                            if (stockBadge) {
+                                stockBadge.textContent = 'Épuisé';
+                                stockBadge.className = 'stock-badge out-of-stock';
+                            }
+                        }
+                    }
+                }
+                
+            } catch (error) {
+                console.error('❌ Erreur lors de l\'ajout au panier depuis la recherche:', error);
+                
+                // Rétablir le bouton en cas d'erreur
+                buttonElement.disabled = false;
+                buttonElement.innerHTML = originalText;
+                
+                cartSystem.showNotification('Erreur lors de l\'ajout au panier', 'error');
+            }
+        }
+        
         // ============================================
         // INITIALISATION
         // ============================================
         
-        // Initialiser les systèmes
-        const searchSystem = new PlantSearchSystem();
-        const cartSystem = new CartSystem();
-
-        // ============================================
-        // FONCTIONS GLOBALES
-        // ============================================
-        
-        // Fonction pour ajouter au panier (appelée par les boutons existants)
-        function addToCart(plantName, price) {
-            cartSystem.addItem(plantName, price);
-        }
-        
-        // Fonction pour ajouter au panier depuis la recherche
-        function addToCartFromSearch(plantName, price) {
-            cartSystem.addItem(plantName, price);
-        }
-
-        // Fonction legacy pour compatibilité
-        function increaseCart(plantName) {
-            // Essayer de deviner le prix depuis les données affichées
-            let price = 0;
-            const plantElements = document.querySelectorAll('.plant1, .plant2, .plant3, .plant4');
-            
-            for (let element of plantElements) {
-                const nameElement = element.querySelector('h4');
-                if (nameElement && nameElement.textContent.trim() === plantName) {
-                    const priceElement = element.querySelector('h5');
-                    if (priceElement) {
-                        const priceText = priceElement.textContent;
-                        const priceMatch = priceText.match(/(\d+\.?\d*)\s*DH/);
-                        if (priceMatch) {
-                            price = parseFloat(priceMatch[1]);
-                            break;
-                        }
-                    }
-                }
-            }
-            
-            cartSystem.addItem(plantName, price);
-        }
-
-        // ============================================
-        // ÉVÉNEMENTS SUPPLÉMENTAIRES
-        // ============================================
-        
-        // Charger le compteur du panier au chargement de la page
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Page chargée, systèmes actifs');
-            
-            // Afficher les informations de debug
+            console.log('🚀 Page chargée avec système de recherche amélioré');
             console.log('📊 État du panier:', {
                 articles: cartSystem.cartItems.length,
                 total: cartSystem.cartCount
             });
-        });
-
-        // Gérer la fermeture des modals avec le clic sur l'arrière-plan
-        document.addEventListener('click', function(e) {
-            const searchResults = document.getElementById('search-results');
-            if (e.target === searchResults) {
-                searchSystem.hideResults();
-            }
-        });
-
-        // ============================================
-        // FONCTIONS UTILITAIRES
-        // ============================================
-        
-        // Fonction pour formater les prix
-        function formatPrice(price) {
-            return typeof price === 'number' ? price.toFixed(2) : '0.00';
-        }
-        
-        // Fonction pour valider les données de plante
-        function validatePlantData(plantName, price) {
-            if (!plantName || typeof plantName !== 'string' || plantName.trim().length === 0) {
-                console.error('Nom de plante invalide:', plantName);
-                return false;
-            }
             
-            if (typeof price !== 'number' || price < 0) {
-                console.error('Prix invalide:', price);
-                return false;
-            }
-            
-            return true;
-        }
-
-        // ============================================
-        // GESTION DES ERREURS GLOBALES
-        // ============================================
-        
-        window.addEventListener('error', function(e) {
-            console.error('Erreur JavaScript:', e.error);
-            // Optionnel : afficher une notification d'erreur à l'utilisateur
+            // Ajouter des styles supplémentaires pour les animations
+            const additionalCSS = document.createElement('style');
+            additionalCSS.textContent = `
+                /* Effets de survol pour les éléments interactifs */
+                .suggestion-item {
+                    transition: all 0.2s ease;
+                }
+                
+                .suggestion-item:hover {
+                    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                    transform: translateX(5px);
+                }
+                
+                /* Animation pour les toasts */
+                .toast {
+                    border-left: 4px solid rgba(255,255,255,0.3);
+                }
+                
+                /* Amélioration du feedback visuel */
+                .add-to-cart-btn:active {
+                    transform: scale(0.95);
+                }
+                
+                /* Responsive pour les très petits écrans */
+                @media (max-width: 360px) {
+                    .plant-card {
+                        margin: 0 5px;
+                    }
+                    
+                    .plant-info {
+                        padding: 15px;
+                    }
+                    
+                    .plant-name {
+                        font-size: 16px;
+                    }
+                    
+                    .plant-price {
+                        font-size: 20px;
+                    }
+                }
+            `;
+            document.head.appendChild(additionalCSS);
         });
 
-        // ============================================
-        // API POUR DÉBUGGER
-        // ============================================
-        
-        // Exposer les systèmes pour le débogage
-        window.debug = {
-            searchSystem,
-            cartSystem,
-            clearCart: () => {
-                cartSystem.cartItems = [];
-                cartSystem.cartCount = 0;
-                cartSystem.saveCart();
-                cartSystem.updateCartDisplay();
-                console.log('🗑️ Panier vidé');
-            },
-            showCart: () => {
-                console.log('🛒 Contenu du panier:', cartSystem.cartItems);
-                return cartSystem.cartItems;
-            },
-            testSearch: (query) => {
-                searchSystem.performSearch(query);
-            }
-        };
-
-        console.log('✅ Tous les systèmes sont initialisés');
-        console.log('💡 Tapez "debug" dans la console pour accéder aux outils de débogage');
-    </script>    
+        console.log('✅ Système de recherche avec affichage amélioré initialisé');
+    </script>
 </body>
 </html>

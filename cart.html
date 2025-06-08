@@ -51,14 +51,73 @@
         // If there are items in the cart, display them
         cartContainer.innerHTML = `
             <div class="paragraph"><p>Your cart has these plants:</p>
-            <ul >${cart.map(plant => `<li>${plant.nom || plant.name || plant}</li>`).join("")}</ul></div>
+            <ul>${cart.map((plant, index) => `
+                <li>
+                    ${plant.nom || plant.name || plant} - ${plant.prix} DH (Quantité: ${plant.quantité || 1})
+                    <button onclick="removeFromCart(${index})" style="margin-left: 10px; background: #f44336; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">Supprimer</button>
+                </li>
+            `).join("")}</ul></div>
             <a href="Home/home.html"><button>Return to shop</button></a>
         `;
     }
 
+    async function removeFromCart(index) {
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+        const item = cart[index];
+        
+        if (!item) return;
+        
+        try {
+            // 1. Remettre le stock côté serveur
+            const response = await fetch('http://localhost:3000/plantes/stock', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    nom: item.nom, 
+                    action: 'increase',
+                    quantity: item.quantité || 1 
+                }),
+            });
+
+            if (response.ok) {
+                // 2. Supprimer du panier local
+                cart.splice(index, 1);
+                localStorage.setItem("cart", JSON.stringify(cart));
+                location.reload();
+            } else {
+                alert('Erreur lors de la suppression');
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Erreur de connexion au serveur');
+        }
+    }
+
     function clearCart() {
-        localStorage.removeItem("cart");
-        location.reload(); // Refresh the page to update the cart view
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+        
+        // Remettre tout le stock pour chaque article
+        Promise.all(cart.map(item => 
+            fetch('http://localhost:3000/plantes/stock', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    nom: item.nom, 
+                    action: 'increase',
+                    quantity: item.quantité || 1 
+                })
+            })
+        )).then(() => {
+            localStorage.removeItem("cart");
+            location.reload();
+        }).catch(error => {
+            console.error('Erreur lors du vidage:', error);
+            // Vider quand même le panier local
+            localStorage.removeItem("cart");
+            location.reload();
+        });
     }
    
   </script>
