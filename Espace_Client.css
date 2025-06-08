@@ -74,3 +74,292 @@ background-color: #f9f9f9;
 br {
 margin-bottom: 10px;
 }
+/* ==========================================
+   VOTRE STYLE EXISTANT (gardé tel quel)
+   ========================================== */
+body {
+    background-image: url("Home/background.png") ;
+    background-repeat: no-repeat; 
+    background-size: cover; 
+    background-position: center; 
+    margin: 0; 
+    padding: 0; 
+    height: 100vh; 
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+}
+
+h1 {
+    text-align: center;
+    color: #ebf3ec;
+    font-family:'Times New Roman', Times, serif;
+    font-size: 50px;
+    margin-top: 50px;
+}
+
+/* Container principal - MÊME STYLE que votre formulaire actuel */
+.form-container {
+    max-width: 500px;
+    margin: 30px auto;
+    padding: 0;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.103);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.788);
+    overflow: hidden;
+}
+
+/* ==========================================
+   NOUVEAUX STYLES POUR LES ONGLETS (intégrés à votre style)
+   ========================================== */
+
+/* Header des onglets */
+.tabs-header {
+    display: flex;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Boutons d'onglets */
+.tab-btn {
+    flex: 1;
+    padding: 15px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #ebf3ec;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+}
+
+.tab-btn.active {
+    background: rgba(76, 175, 80, 0.3);
+    border-bottom-color: #4CAF50;
+    color: white;
+}
+
+.tab-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Contenu des onglets */
+.tab-content {
+    display: none;
+    padding: 20px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* ==========================================
+   VOTRE STYLE FORM EXISTANT (gardé tel quel)
+   ========================================== */
+
+/* Styles pour les labels */
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+    color: #333;
+}
+
+/* Styles pour les champs de saisie */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
+}
+
+/* Styles pour le bouton */
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    width: 100%;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* Changer la couleur du bouton au survol */
+button:hover:not(:disabled) {
+    background-color: #45a049;
+}
+
+button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Ajouter un style aux champs obligatoires */
+input[required] {
+    background-color: #f9f9f9;
+}
+
+/* ==========================================
+   NOUVEAUX STYLES POUR LE MOT DE PASSE
+   ========================================== */
+
+/* Container pour le champ mot de passe */
+.password-field {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.password-field input {
+    margin-bottom: 0;
+    padding-right: 45px;
+}
+
+/* Bouton pour montrer/cacher le mot de passe */
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+    color: #666;
+    user-select: none;
+    padding: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+
+.password-toggle:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Indicateur de force du mot de passe */
+.password-strength {
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 15px;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.strength-weak { 
+    color: #f44336;
+    background-color: rgba(244, 67, 54, 0.1);
+}
+
+.strength-medium { 
+    color: #FF9800;
+    background-color: rgba(255, 152, 0, 0.1);
+}
+
+.strength-strong { 
+    color: #4CAF50;
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+/* ==========================================
+   STYLES POUR LES MESSAGES POPUP
+   ========================================== */
+
+.message-popup {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    max-width: 400px;
+    text-align: center;
+    cursor: pointer;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateX(-50%) translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+.message-popup.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message-popup.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.message-icon {
+    font-size: 18px;
+    margin-right: 10px;
+}
+
+.message-text {
+    font-size: 14px;
+}
+
+/* ==========================================
+   LIEN MOT DE PASSE OUBLIÉ
+   ========================================== */
+
+.forgot-link {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.forgot-link a {
+    color: #4CAF50;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.forgot-link a:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+
+@media (max-width: 600px) {
+    .form-container {
+        margin: 20px;
+        max-width: none;
+    }
+    
+    h1 {
+        font-size: 35px;
+        margin-top: 30px;
+    }
+    
+    .tab-btn {
+        padding: 12px 15px;
+        font-size: 14px;
+    }
+    
+    .tab-content {
+        padding: 15px;
+    }
+}

@@ -7,16 +7,246 @@
     <link rel="stylesheet" href="home.css">
     <link rel="icon" href="icone2.ico">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Styles additionnels pour la recherche et les notifications -->
+    <style>
+        /* Styles pour les suggestions de recherche */
+        .search-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        #search-suggestions {
+            display: none;
+            position: absolute;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+            width: 100%;
+            top: 100%;
+            left: 0;
+        }
+        
+        .suggestion-item {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .suggestion-item:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+        
+        /* Styles pour les résultats de recherche */
+        #search-results {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .search-results-header {
+            color: white;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .search-results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .plant-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .plant-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .plant-image-container {
+            height: 200px;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .plant-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .plant-info {
+            padding: 16px;
+        }
+        
+        .plant-name {
+            margin: 0 0 8px 0;
+            color: #333;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .plant-scientific {
+            color: #666;
+            font-style: italic;
+            margin: 0 0 8px 0;
+            font-size: 14px;
+        }
+        
+        .plant-description {
+            color: #666;
+            font-size: 14px;
+            margin: 0 0 12px 0;
+            line-height: 1.4;
+        }
+        
+        .plant-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .plant-price {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2196F3;
+        }
+        
+        .plant-stock {
+            font-size: 12px;
+        }
+        
+        .stock-available {
+            color: #4CAF50;
+        }
+        
+        .stock-unavailable {
+            color: #f44336;
+        }
+        
+        .plant-category {
+            color: #999;
+            font-size: 12px;
+            margin: 8px 0 0 0;
+        }
+        
+        .add-to-cart-btn {
+            width: 100%;
+            padding: 10px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .add-to-cart-btn:hover {
+            background: #45a049;
+        }
+        
+        .add-to-cart-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .close-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .close-btn:hover {
+            background: #d32f2f;
+        }
+        
+        /* Notification toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            z-index: 2000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .toast.error {
+            background: #f44336;
+        }
+        
+        /* Animation de chargement */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
     <section class="top-page">
-        <header class ="header">
+        <header class="header">
             <img src="image.png" alt="logo du site">
             <nav class="nav">
                 <li><a href="../plant_care.html" class="dont">Plant care </a></li>
                 <li><a href="../contact.html" class="dont">Contact us</a></li>
             </nav>
-            <input type="search" placeholder="What plant are you looking for ?">
+            
+            <!-- Barre de recherche améliorée -->
+            <div class="search-container">
+                <input type="search" id="search-input" placeholder="What plant are you looking for ?">
+                <div id="search-suggestions"></div>
+            </div>
+            
             <div class="icon-container">
                 <a href="../cart.html"><i class="fas fa-shopping-bag"></i></a>
                 <span id="cart-count">0</span>
@@ -24,99 +254,590 @@
             </div>
         </header>
         <hr>
-    <p style="margin-top: 130px;">
-        A Community To Buy, Sell & Discover The Magic Of Plants 
-    </p>
+        <p style="margin-top: 130px;">
+            A Community To Buy, Sell & Discover The Magic Of Plants 
+        </p>
     </section><br><br><br>
 
+    <!-- Conteneur pour les résultats de recherche -->
+    <div id="search-results">
+        <div class="search-results-header">
+            <h2>Résultats de recherche</h2>
+            <button id="close-search" class="close-btn">✕ Fermer</button>
+        </div>
+        <div class="search-results-grid" id="results-grid">
+            <!-- Les résultats apparaîtront ici -->
+        </div>
+    </div>
+
+    <!-- Section des plantes existante -->
     <section class="les-plantes">
         <nav class="plantes">
             <div class="plant1">
                 <img src="../Plants/1st plant.jpg" alt="plant" width="150px" height="260px">
-                <h5 style="color:  rgb(40, 167, 199); font-size: 20px" > 199.99 DH  <s style="color: gray; font-size: 15px ;">299.99 DH</s></h5>
-                <h4> Zamioculcas zamiifolia </h4>
-                <h3 style="font-size: 13px ;
-                font-weight: 390;"> Quantity in stock : 24</h3>
-                <button onclick="increaseCart('Zamioculcas zamiifolia')"> Add to cart </button>
+                <h5 style="color: rgb(40, 167, 199); font-size: 20px"> 199.99 DH <s style="color: gray; font-size: 15px;">299.99 DH</s></h5>
+                <h4>Zamioculcas zamiifolia</h4>
+                <h3 style="font-size: 13px; font-weight: 390;">Quantity in stock : 24</h3>
+                <button onclick="addToCart('Zamioculcas zamiifolia', 199.99)">Add to cart</button>
             </div>
             
             <div class="plant2">
                 <img src="../Plants/plante4.jpg" alt="plant" width="150px" height="260">
-                <h5 style="color:  rgb(46, 43, 43); font-size: 20px" > 150.00 DH</h5>                
+                <h5 style="color: rgb(46, 43, 43); font-size: 20px">150.00 DH</h5>                
                 <h4>Aglaonema</h4>
-                <h3 style="font-size: 13px ;
-                font-weight: 390;"> Quantity in stock : 32</h3> 
-                <button onclick="increaseCart('Aglaonema')"> Add to cart </button>
+                <h3 style="font-size: 13px; font-weight: 390;">Quantity in stock : 32</h3> 
+                <button onclick="addToCart('Aglaonema', 150.00)">Add to cart</button>
             </div>
 
             <div class="plant3">
                 <img src="../Plants/plante3.jpg" alt="plant" width="150px" height="260">
-                <h5 style="color:  rgb(40, 167, 199); font-size: 20px" > 50.00 DH  <s style="color: gray; font-size: 15px ;">99.99 DH</s></h5>
+                <h5 style="color: rgb(40, 167, 199); font-size: 20px">50.00 DH <s style="color: gray; font-size: 15px;">99.99 DH</s></h5>
                 <h4>Philodendron Xanadu</h4>
-                <h3 style="font-size: 13px ;
-                font-weight: 390;"> Quantity in stock : 17</h3>  
-                <button onclick="increaseCart('Philodendron Xanadu')"> Add to cart </button>
+                <h3 style="font-size: 13px; font-weight: 390;">Quantity in stock : 17</h3>  
+                <button onclick="addToCart('Philodendron Xanadu', 50.00)">Add to cart</button>
             </div>
             
             <div class="plant4">
                 <img src="../Plants/plant5.jpg" alt="plant" width="150px" height="260">
-                <h5 style="color: rgb(46, 43, 43); font-size: 20px" > 179.99 DH</h5>
+                <h5 style="color: rgb(46, 43, 43); font-size: 20px">179.99 DH</h5>
                 <h4>Sansevieria trifasciata</h4>
-                <h3 style="font-size: 13px ;
-                font-weight: 390;"> Quantity in stock : 24</h3>
-                <button onclick="increaseCart('Sansevieria trifasciata')"> Add to cart </button>
+                <h3 style="font-size: 13px; font-weight: 390;">Quantity in stock : 24</h3>
+                <button onclick="addToCart('Sansevieria trifasciata', 179.99)">Add to cart</button>
             </div>
         </nav><br><br>
+        
         <nav class="plantes">
             <div class="plant1">
                 <img src="../Plants/1st plant.jpg" alt="plant" width="150px" height="260px">
-                <h5 style="color:  rgb(40, 167, 199); font-size: 20px" > 199.99 DH  <s style="color: gray; font-size: 15px ;">299.99 DH</s></h5>
-                <h4> Zamioculcas zamiifolia </h4>
-                <h3 style="font-size: 13px ;
-                font-weight: 390;"> Quantity in stock : 32</h3>
-                <button onclick="increaseCart('Zamioculcas zamiifolia')"> Add to cart </button>
+                <h5 style="color: rgb(40, 167, 199); font-size: 20px">199.99 DH <s style="color: gray; font-size: 15px;">299.99 DH</s></h5>
+                <h4>Zamioculcas zamiifolia</h4>
+                <h3 style="font-size: 13px; font-weight: 390;">Quantity in stock : 32</h3>
+                <button onclick="addToCart('Zamioculcas zamiifolia', 199.99)">Add to cart</button>
             </div>
             
             <div class="plant2">
                 <img src="../Plants/plante4.jpg" alt="plant" width="150px" height="260">
-                <h5 style="color:  rgb(46, 43, 43); font-size: 20px" > 150.00 DH</h5>                
+                <h5 style="color: rgb(46, 43, 43); font-size: 20px">150.00 DH</h5>                
                 <h4>Aglaonema</h4>
-                <h3 style="font-size: 13px ;
-                font-weight: 390;"> Quantity in stock : 17</h3>
-                <button onclick="increaseCart('Aglaonema')"> Add to cart </button>
+                <h3 style="font-size: 13px; font-weight: 390;">Quantity in stock : 17</h3>
+                <button onclick="addToCart('Aglaonema', 150.00)">Add to cart</button>
             </div>
 
             <div class="plant3">
                 <img src="../Plants/plante3.jpg" alt="plant" width="150px" height="260">
-                <h5 style="color:  rgb(40, 167, 199); font-size: 20px" > 50.00 DH  <s style="color: gray; font-size: 15px ;">99.99 DH</s></h5>
+                <h5 style="color: rgb(40, 167, 199); font-size: 20px">50.00 DH <s style="color: gray; font-size: 15px;">99.99 DH</s></h5>
                 <h4>Philodendron Xanadu</h4>
-                <h3 style="font-size: 13px ;
-                font-weight: 390;"> Quantity in stock : 45</h3>  
-                <button onclick="increaseCart('Philodendron Xanadu')"> Add to cart </button>
+                <h3 style="font-size: 13px; font-weight: 390;">Quantity in stock : 45</h3>  
+                <button onclick="addToCart('Philodendron Xanadu', 50.00)">Add to cart</button>
             </div>
             
             <div class="plant4">
                 <img src="../Plants/plant5.jpg" alt="plant" width="150px" height="260">
-                <h5 style="color: rgb(46, 43, 43); font-size: 20px" > 179.99 DH</h5>
+                <h5 style="color: rgb(46, 43, 43); font-size: 20px">179.99 DH</h5>
                 <h4>Sansevieria trifasciata</h4>
-                <h3 style="font-size: 13px ;
-                font-weight: 390;"> Quantity in stock : 6</h3>
-                <button onclick="increaseCart('Sansevieria trifasciata')"> Add to cart </button>
+                <h3 style="font-size: 13px; font-weight: 390;">Quantity in stock : 6</h3>
+                <button onclick="addToCart('Sansevieria trifasciata', 179.99)">Add to cart</button>
             </div>
         </nav>
     </section><br><br><br><br>
+
+    <!-- Conteneur pour les notifications toast -->
+    <div id="toast-container"></div>
+
     <script>
-        function increaseCart(plantName) {
-            // Update the cart counter
-            const cartElement = document.getElementById("cart-count");
-            let score = parseInt(cartElement.innerText, 10);
-            cartElement.innerText = score + 1;
-    
-            // Add the selected plant to localStorage
-            let cart = JSON.parse(localStorage.getItem("cart")) || [];
-            cart.push(plantName); // Add the selected plant
-            localStorage.setItem("cart", JSON.stringify(cart));
+        // ============================================
+        // SYSTÈME DE RECHERCHE COMPLET
+        // ============================================
+        
+        class PlantSearchSystem {
+            constructor() {
+                this.searchInput = null;
+                this.suggestionsContainer = null;
+                this.resultsContainer = null;
+                this.currentQuery = '';
+                this.searchTimeout = null;
+                
+                this.init();
+            }
+            
+            init() {
+                // Attendre que le DOM soit chargé
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', () => this.setupSearch());
+                } else {
+                    this.setupSearch();
+                }
+            }
+            
+            setupSearch() {
+                // Trouver les éléments
+                this.searchInput = document.getElementById('search-input');
+                this.suggestionsContainer = document.getElementById('search-suggestions');
+                this.resultsContainer = document.getElementById('search-results');
+                
+                if (!this.searchInput) {
+                    console.error('❌ Barre de recherche non trouvée');
+                    return;
+                }
+                
+                console.log('✅ Système de recherche initialisé');
+                
+                // Ajouter les écouteurs d'événements
+                this.addEventListeners();
+            }
+            
+            addEventListeners() {
+                // Recherche en temps réel avec suggestions
+                this.searchInput.addEventListener('input', (e) => {
+                    const query = e.target.value.trim();
+                    
+                    // Annuler la recherche précédente
+                    if (this.searchTimeout) {
+                        clearTimeout(this.searchTimeout);
+                    }
+                    
+                    // Suggestions après 300ms
+                    if (query.length >= 2) {
+                        this.searchTimeout = setTimeout(() => {
+                            this.getSuggestions(query);
+                        }, 300);
+                    } else {
+                        this.hideSuggestions();
+                    }
+                });
+                
+                // Recherche à l'appui sur Entrée
+                this.searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const query = e.target.value.trim();
+                        if (query.length > 0) {
+                            this.performSearch(query);
+                        }
+                    }
+                });
+                
+                // Fermer les suggestions quand on clique ailleurs
+                document.addEventListener('click', (e) => {
+                    if (!this.searchInput.contains(e.target) && 
+                        !this.suggestionsContainer.contains(e.target)) {
+                        this.hideSuggestions();
+                    }
+                });
+                
+                // Bouton fermer des résultats
+                document.getElementById('close-search').addEventListener('click', () => {
+                    this.hideResults();
+                });
+                
+                // Fermer avec Escape
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        this.hideResults();
+                        this.hideSuggestions();
+                    }
+                });
+            }
+            
+            async getSuggestions(query) {
+                try {
+                    const response = await fetch(`/api/search/suggestions?query=${encodeURIComponent(query)}`);
+                    const data = await response.json();
+                    
+                    if (data.success && data.suggestions.length > 0) {
+                        this.showSuggestions(data.suggestions);
+                    } else {
+                        this.hideSuggestions();
+                    }
+                } catch (error) {
+                    console.error('❌ Erreur suggestions:', error);
+                    this.hideSuggestions();
+                }
+            }
+            
+            showSuggestions(suggestions) {
+                const suggestionsHTML = suggestions.map(suggestion => `
+                    <div class="suggestion-item" data-name="${suggestion.name}">
+                        <strong>${suggestion.name}</strong>
+                        ${suggestion.scientificName ? `<br><small style="color: #666;">${suggestion.scientificName}</small>` : ''}
+                    </div>
+                `).join('');
+                
+                this.suggestionsContainer.innerHTML = suggestionsHTML;
+                this.suggestionsContainer.style.display = 'block';
+                
+                // Ajouter les écouteurs sur les suggestions
+                this.suggestionsContainer.querySelectorAll('.suggestion-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const plantName = item.dataset.name;
+                        this.searchInput.value = plantName;
+                        this.hideSuggestions();
+                        this.performSearch(plantName);
+                    });
+                });
+            }
+            
+            hideSuggestions() {
+                this.suggestionsContainer.style.display = 'none';
+            }
+            
+            async performSearch(query) {
+                console.log('🔍 Recherche pour:', query);
+                this.currentQuery = query;
+                this.hideSuggestions();
+                
+                try {
+                    // Afficher un indicateur de chargement
+                    this.showLoadingResults();
+                    
+                    const response = await fetch(`/api/search/plants?query=${encodeURIComponent(query)}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.showResults(data);
+                    } else {
+                        this.showError('Erreur lors de la recherche');
+                    }
+                } catch (error) {
+                    console.error('❌ Erreur recherche:', error);
+                    this.showError('Erreur de connexion au serveur');
+                }
+            }
+            
+            showLoadingResults() {
+                const grid = document.getElementById('results-grid');
+                grid.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: white;">
+                        <div class="loading-spinner"></div>
+                        <p style="margin-top: 16px;">Recherche en cours...</p>
+                    </div>
+                `;
+                this.resultsContainer.style.display = 'block';
+            }
+            
+            showResults(data) {
+                const grid = document.getElementById('results-grid');
+                
+                if (data.plants.length === 0) {
+                    grid.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: white; grid-column: 1 / -1;">
+                            <div style="font-size: 48px; margin-bottom: 20px;">🌱</div>
+                            <h3>Aucune plante trouvée</h3>
+                            <p>Essayez avec d'autres mots-clés pour "${this.currentQuery}"</p>
+                        </div>
+                    `;
+                } else {
+                    const plantsHTML = data.plants.map(plant => this.createPlantCard(plant)).join('');
+                    grid.innerHTML = `
+                        <div style="color: white; margin-bottom: 20px; grid-column: 1 / -1;">
+                            <h3>${data.totalResults} résultat(s) pour "${this.currentQuery}"</h3>
+                        </div>
+                        ${plantsHTML}
+                    `;
+                }
+                
+                this.resultsContainer.style.display = 'block';
+            }
+            
+            createPlantCard(plant) {
+                return `
+                    <div class="plant-card">
+                        <div class="plant-image-container">
+                            ${plant.imageUrl ? 
+                                `<img src="${plant.imageUrl}" alt="${plant.name}">` :
+                                `<div style="font-size: 48px; color: #ccc;">🌱</div>`
+                            }
+                        </div>
+                        <div class="plant-info">
+                            <h4 class="plant-name">${plant.name}</h4>
+                            ${plant.scientificName ? `<p class="plant-scientific">${plant.scientificName}</p>` : ''}
+                            <p class="plant-description">${plant.description ? plant.description.substring(0, 100) + '...' : 'Description non disponible'}</p>
+                            <div class="plant-details">
+                                <span class="plant-price">${plant.price} DH</span>
+                                <span class="plant-stock ${plant.stockQuantity > 0 ? 'stock-available' : 'stock-unavailable'}">
+                                    ${plant.stockQuantity > 0 ? `${plant.stockQuantity} en stock` : 'Rupture de stock'}
+                                </span>
+                            </div>
+                            ${plant.category ? `<p class="plant-category">Catégorie: ${plant.category}</p>` : ''}
+                            <button class="add-to-cart-btn" 
+                                    onclick="addToCartFromSearch('${plant.name}', ${plant.price})"
+                                    ${plant.stockQuantity <= 0 ? 'disabled' : ''}>
+                                ${plant.stockQuantity > 0 ? 'Ajouter au panier' : 'Indisponible'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            showError(message) {
+                const grid = document.getElementById('results-grid');
+                grid.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: white; grid-column: 1 / -1;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
+                        <h3>Erreur</h3>
+                        <p>${message}</p>
+                    </div>
+                `;
+                this.resultsContainer.style.display = 'block';
+            }
+            
+            hideResults() {
+                this.resultsContainer.style.display = 'none';
+                this.searchInput.value = '';
+                this.currentQuery = '';
+            }
         }
+
+        // ============================================
+        // SYSTÈME DE PANIER AMÉLIORÉ
+        // ============================================
+        
+        class CartSystem {
+            constructor() {
+                this.cartCount = 0;
+                this.cartItems = [];
+                this.init();
+            }
+            
+            init() {
+                // Charger le panier depuis localStorage
+                this.loadCart();
+                this.updateCartDisplay();
+            }
+            
+            loadCart() {
+                const savedCart = localStorage.getItem('cart');
+                if (savedCart) {
+                    try {
+                        this.cartItems = JSON.parse(savedCart);
+                        this.cartCount = this.cartItems.reduce((total, item) => total + (item.quantity || 1), 0);
+                    } catch (error) {
+                        console.error('Erreur lors du chargement du panier:', error);
+                        this.cartItems = [];
+                        this.cartCount = 0;
+                    }
+                }
+            }
+            
+            saveCart() {
+                localStorage.setItem('cart', JSON.stringify(this.cartItems));
+            }
+            
+            addItem(plantName, price) {
+                // Vérifier si l'article existe déjà
+                const existingItem = this.cartItems.find(item => item.name === plantName);
+                
+                if (existingItem) {
+                    existingItem.quantity = (existingItem.quantity || 1) + 1;
+                } else {
+                    this.cartItems.push({
+                        name: plantName,
+                        price: price,
+                        quantity: 1,
+                        addedAt: new Date().toISOString()
+                    });
+                }
+                
+                this.cartCount++;
+                this.saveCart();
+                this.updateCartDisplay();
+                
+                // Envoyer à l'API si besoin
+                this.syncWithServer(plantName);
+                
+                // Afficher une notification
+                this.showNotification(`${plantName} ajouté au panier`, 'success');
+                
+                console.log('🛒 Article ajouté:', plantName, 'Total articles:', this.cartCount);
+            }
+            
+            async syncWithServer(plantName) {
+                try {
+                    const response = await fetch('/api/cart/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            plantName: plantName,
+                            quantity: 1
+                            // userId: currentUser?.id // Si l'utilisateur est connecté
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    if (!data.success) {
+                        console.warn('Avertissement serveur:', data.message);
+                        if (data.message.includes('Stock insuffisant')) {
+                            this.showNotification(data.message, 'error');
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Erreur de synchronisation avec le serveur:', error);
+                    // Continuer en mode local
+                }
+            }
+            
+            updateCartDisplay() {
+                const cartElement = document.getElementById('cart-count');
+                if (cartElement) {
+                    cartElement.textContent = this.cartCount;
+                }
+            }
+            
+            showNotification(message, type = 'success') {
+                // Créer l'élément toast
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                
+                // Ajouter au conteneur
+                const container = document.getElementById('toast-container') || document.body;
+                container.appendChild(toast);
+                
+                // Afficher avec animation
+                setTimeout(() => toast.classList.add('show'), 100);
+                
+                // Supprimer après 3 secondes
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => {
+                        if (toast.parentNode) {
+                            toast.parentNode.removeChild(toast);
+                        }
+                    }, 300);
+                }, 3000);
+            }
+        }
+
+        // ============================================
+        // INITIALISATION
+        // ============================================
+        
+        // Initialiser les systèmes
+        const searchSystem = new PlantSearchSystem();
+        const cartSystem = new CartSystem();
+
+        // ============================================
+        // FONCTIONS GLOBALES
+        // ============================================
+        
+        // Fonction pour ajouter au panier (appelée par les boutons existants)
+        function addToCart(plantName, price) {
+            cartSystem.addItem(plantName, price);
+        }
+        
+        // Fonction pour ajouter au panier depuis la recherche
+        function addToCartFromSearch(plantName, price) {
+            cartSystem.addItem(plantName, price);
+        }
+
+        // Fonction legacy pour compatibilité
+        function increaseCart(plantName) {
+            // Essayer de deviner le prix depuis les données affichées
+            let price = 0;
+            const plantElements = document.querySelectorAll('.plant1, .plant2, .plant3, .plant4');
+            
+            for (let element of plantElements) {
+                const nameElement = element.querySelector('h4');
+                if (nameElement && nameElement.textContent.trim() === plantName) {
+                    const priceElement = element.querySelector('h5');
+                    if (priceElement) {
+                        const priceText = priceElement.textContent;
+                        const priceMatch = priceText.match(/(\d+\.?\d*)\s*DH/);
+                        if (priceMatch) {
+                            price = parseFloat(priceMatch[1]);
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            cartSystem.addItem(plantName, price);
+        }
+
+        // ============================================
+        // ÉVÉNEMENTS SUPPLÉMENTAIRES
+        // ============================================
+        
+        // Charger le compteur du panier au chargement de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Page chargée, systèmes actifs');
+            
+            // Afficher les informations de debug
+            console.log('📊 État du panier:', {
+                articles: cartSystem.cartItems.length,
+                total: cartSystem.cartCount
+            });
+        });
+
+        // Gérer la fermeture des modals avec le clic sur l'arrière-plan
+        document.addEventListener('click', function(e) {
+            const searchResults = document.getElementById('search-results');
+            if (e.target === searchResults) {
+                searchSystem.hideResults();
+            }
+        });
+
+        // ============================================
+        // FONCTIONS UTILITAIRES
+        // ============================================
+        
+        // Fonction pour formater les prix
+        function formatPrice(price) {
+            return typeof price === 'number' ? price.toFixed(2) : '0.00';
+        }
+        
+        // Fonction pour valider les données de plante
+        function validatePlantData(plantName, price) {
+            if (!plantName || typeof plantName !== 'string' || plantName.trim().length === 0) {
+                console.error('Nom de plante invalide:', plantName);
+                return false;
+            }
+            
+            if (typeof price !== 'number' || price < 0) {
+                console.error('Prix invalide:', price);
+                return false;
+            }
+            
+            return true;
+        }
+
+        // ============================================
+        // GESTION DES ERREURS GLOBALES
+        // ============================================
+        
+        window.addEventListener('error', function(e) {
+            console.error('Erreur JavaScript:', e.error);
+            // Optionnel : afficher une notification d'erreur à l'utilisateur
+        });
+
+        // ============================================
+        // API POUR DÉBUGGER
+        // ============================================
+        
+        // Exposer les systèmes pour le débogage
+        window.debug = {
+            searchSystem,
+            cartSystem,
+            clearCart: () => {
+                cartSystem.cartItems = [];
+                cartSystem.cartCount = 0;
+                cartSystem.saveCart();
+                cartSystem.updateCartDisplay();
+                console.log('🗑️ Panier vidé');
+            },
+            showCart: () => {
+                console.log('🛒 Contenu du panier:', cartSystem.cartItems);
+                return cartSystem.cartItems;
+            },
+            testSearch: (query) => {
+                searchSystem.performSearch(query);
+            }
+        };
+
+        console.log('✅ Tous les systèmes sont initialisés');
+        console.log('💡 Tapez "debug" dans la console pour accéder aux outils de débogage');
     </script>    
 </body>
 </html>

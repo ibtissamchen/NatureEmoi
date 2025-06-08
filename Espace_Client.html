@@ -1,58 +1,315 @@
 <!DOCTYPE html>
- <html lang="en">
- <head>
-     <meta charset="UTF-8">
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>NatureEmoi</title>
-     <link rel="icon" href="Home/icone2.ico">
-     <link href="Espace_Client.css" rel="stylesheet">
- </head>
- <body>
-     <h1>Formulaire d'inscription</h1>
- 
-     <form id="client">
-         <label for="username">Nom d'utilisateur :</label>
-         <input type="text" id="username" name="username" required><br><br>
- 
-         <label for="email">Email :</label>
-         <input type="email" id="email" name="email" required><br><br>
- 
-         <label for="adresse">Adresse :</label>
-         <input type="text" id="adresse" name="adresse" required><br><br>
- 
-         <label for="num_tel">Numéro de téléphone :</label>
-         <input type="tel" id="num_tel" name="num_tel" required><br><br>
- 
-         <button type="submit">Soumettre</button>
-     </form>
-     <script > 
-     const apiUrl = 'http://localhost:3000';
-     document.getElementById("client").addEventListener('submit', async (e) => {
-         e.preventDefault();
-                 const username = document.getElementById('username').value;
-                 const email = document.getElementById('email').value;
-                 const adresse = document.getElementById('adresse').value;
-                 const num_tel = document.getElementById('num_tel').value;
-         try {
-             const response = await fetch(`${apiUrl}/clients`, {
-                 method: 'POST',
-                 headers: {
-                     'Content-Type': 'application/json',
-                 },
-                 body: JSON.stringify({ username, email , adresse , num_tel }),
-             });
-             if (response.ok) {
-                 alert('client  ajouté avec succès');
-             } else {
-                 const errorData = await response.json();
-                 alert("erreur :" + errorData.error);
-             }
-         } catch (error) {
-             console.error('Erreur :', error);
-             alert("impossible de se connecter au serveur !")
-         }
-     });
-     </script>
- </body>
- 
- </html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NatureEmoi - Espace Client</title>
+    <link rel="icon" href="Home/icone2.ico">
+    <link href="Espace_Client.css" rel="stylesheet">
+</head>
+<body>
+    <h1>Espace Client NatureEmoi</h1>
+    
+    <!-- Container principal avec votre style exact -->
+    <div class="form-container">
+        <!-- ONGLETS -->
+        <div class="tabs-header">
+            <button class="tab-btn active" onclick="switchTab('register')" id="registerTabBtn">
+                Inscription
+            </button>
+            <button class="tab-btn" onclick="switchTab('login')" id="loginTabBtn">
+                Connexion
+            </button>
+        </div>
+
+        <!-- FORMULAIRE D'INSCRIPTION -->
+        <div id="registerSection" class="tab-content active">
+            <form id="registerForm">
+                <label for="regNom">Nom d'utilisateur :</label>
+                <input type="text" id="regNom" name="nom" required>
+                
+                <label for="regEmail">Email :</label>
+                <input type="email" id="regEmail" name="email" required>
+                
+                <label for="regPassword">Mot de passe :</label>
+                <div class="password-field">
+                    <input type="password" id="regPassword" name="password" required>
+                    <span class="password-toggle" onclick="togglePassword('regPassword')">👁️</span>
+                </div>
+                <div id="passwordStrength" class="password-strength"></div>
+                
+                <label for="regAdresse">Adresse :</label>
+                <input type="text" id="regAdresse" name="adresse" required>
+                
+                <label for="regTelephone">Numéro de téléphone :</label>
+                <input type="tel" id="regTelephone" name="telephone" required>
+                
+                <button type="submit" id="registerBtn">S'inscrire</button>
+            </form>
+        </div>
+
+        <!-- FORMULAIRE DE CONNEXION -->
+        <div id="loginSection" class="tab-content">
+            <form id="loginForm">
+                <label for="loginEmail">Email :</label>
+                <input type="email" id="loginEmail" name="email" required>
+                
+                <label for="loginPassword">Mot de passe :</label>
+                <div class="password-field">
+                    <input type="password" id="loginPassword" name="password" required>
+                    <span class="password-toggle" onclick="togglePassword('loginPassword')">👁️</span>
+                </div>
+                
+                <button type="submit" id="loginBtn">Se connecter</button>
+                
+                <div class="forgot-link">
+                    <a href="#" onclick="showForgotPassword()">Mot de passe oublié ?</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        console.log('🌱 Page chargée - JavaScript activé');
+        
+        // Variables globales
+        let currentTab = 'register';
+        
+        // Fonction pour changer d'onglet
+        function switchTab(tabName) {
+            // Retirer la classe active de tous les onglets et contenus
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Activer l'onglet et le contenu sélectionnés
+            document.getElementById(tabName + 'TabBtn').classList.add('active');
+            document.getElementById(tabName + 'Section').classList.add('active');
+            
+            currentTab = tabName;
+            console.log('Onglet actif:', tabName);
+        }
+        
+        // Fonction pour basculer la visibilité du mot de passe
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const toggle = input.nextElementSibling;
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggle.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                toggle.textContent = '👁️';
+            }
+        }
+        
+        // Fonction pour vérifier la force du mot de passe
+        function checkPasswordStrength(password) {
+            const strengthDiv = document.getElementById('passwordStrength');
+            let strength = 0;
+            let message = '';
+            
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            
+            switch (strength) {
+                case 0:
+                case 1:
+                    strengthDiv.className = 'password-strength strength-weak';
+                    message = 'Mot de passe faible';
+                    break;
+                case 2:
+                case 3:
+                    strengthDiv.className = 'password-strength strength-medium';
+                    message = 'Mot de passe moyen';
+                    break;
+                case 4:
+                case 5:
+                    strengthDiv.className = 'password-strength strength-strong';
+                    message = 'Mot de passe fort';
+                    break;
+            }
+            
+            strengthDiv.textContent = message;
+        }
+        
+        // Fonction pour afficher des messages
+        function showMessage(message, type = 'success') {
+            console.log(`📢 Message: ${message} (${type})`);
+            
+            // Supprimer ancien message
+            const existing = document.querySelector('.message-popup');
+            if (existing) existing.remove();
+            
+            // Créer nouveau message
+            const div = document.createElement('div');
+            div.className = `message-popup ${type}`;
+            div.innerHTML = `
+                <span class="message-icon">${type === 'success' ? '✅' : '❌'}</span>
+                <span class="message-text">${message}</span>
+            `;
+            
+            document.body.appendChild(div);
+            
+            // Supprimer après 5 secondes
+            setTimeout(() => {
+                if (div.parentNode) div.remove();
+            }, 5000);
+            
+            // Supprimer en cliquant
+            div.onclick = () => {
+                if (div.parentNode) div.remove();
+            };
+        }
+        
+        // Fonction pour gérer l'état du bouton
+        function setButtonLoading(buttonId, loading) {
+            const btn = document.getElementById(buttonId);
+            if (loading) {
+                btn.disabled = true;
+                btn.textContent = buttonId === 'registerBtn' ? 'Inscription...' : 'Connexion...';
+            } else {
+                btn.disabled = false;
+                btn.textContent = buttonId === 'registerBtn' ? 'S\'inscrire' : 'Se connecter';
+            }
+        }
+        
+        // Gestion de l'inscription
+        function handleRegister(event) {
+            event.preventDefault();
+            console.log('🚀 === INSCRIPTION ===');
+            
+            setButtonLoading('registerBtn', true);
+            
+            const formData = {
+                nom: document.getElementById('regNom').value.trim(),
+                email: document.getElementById('regEmail').value.trim(),
+                password: document.getElementById('regPassword').value,
+                adresse: document.getElementById('regAdresse').value.trim(),
+                telephone: document.getElementById('regTelephone').value.trim()
+            };
+            
+            console.log('📦 Données d\'inscription:', { ...formData, password: '[MASQUÉ]' });
+            
+            // Validation
+            if (!formData.nom || !formData.email || !formData.password || !formData.adresse || !formData.telephone) {
+                setButtonLoading('registerBtn', false);
+                showMessage('Veuillez remplir tous les champs', 'error');
+                return;
+            }
+            
+            if (formData.password.length < 6) {
+                setButtonLoading('registerBtn', false);
+                showMessage('Le mot de passe doit contenir au moins 6 caractères', 'error');
+                return;
+            }
+            
+            // Envoyer la requête d'inscription
+            fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(result => {
+                setButtonLoading('registerBtn', false);
+                
+                if (result.success) {
+                    showMessage('Inscription réussie ! Vous pouvez maintenant vous connecter.', 'success');
+                    document.getElementById('registerForm').reset();
+                    document.getElementById('passwordStrength').textContent = '';
+                    
+                    // Basculer vers l'onglet connexion
+                    setTimeout(() => {
+                        switchTab('login');
+                        document.getElementById('loginEmail').value = formData.email;
+                    }, 2000);
+                } else {
+                    showMessage(result.message || 'Erreur lors de l\'inscription', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('❌ Erreur inscription:', error);
+                setButtonLoading('registerBtn', false);
+                showMessage('Erreur de connexion. Veuillez réessayer.', 'error');
+            });
+        }
+        
+        // Gestion de la connexion
+        function handleLogin(event) {
+            event.preventDefault();
+            console.log('🔐 === CONNEXION ===');
+            
+            setButtonLoading('loginBtn', true);
+            
+            const formData = {
+                email: document.getElementById('loginEmail').value.trim(),
+                password: document.getElementById('loginPassword').value
+            };
+            
+            console.log('📦 Données de connexion:', { ...formData, password: '[MASQUÉ]' });
+            
+            // Validation
+            if (!formData.email || !formData.password) {
+                setButtonLoading('loginBtn', false);
+                showMessage('Veuillez remplir tous les champs', 'error');
+                return;
+            }
+            
+            // Envoyer la requête de connexion
+            fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(result => {
+                setButtonLoading('loginBtn', false);
+                
+                if (result.success) {
+                    // Stocker les données utilisateur
+                    localStorage.setItem('naturemoi_user', JSON.stringify(result.user));
+                    
+                    showMessage(`Connexion réussie ! Bienvenue ${result.user.nom}.`, 'success');
+                    
+                    // Rediriger vers l'accueil
+                    setTimeout(() => {
+                        window.location.href = '/Home/home.html';
+                    }, 2000);
+                } else {
+                    showMessage(result.message || 'Erreur de connexion', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('❌ Erreur connexion:', error);
+                setButtonLoading('loginBtn', false);
+                showMessage('Erreur de connexion. Veuillez réessayer.', 'error');
+            });
+        }
+        
+        // Fonction pour mot de passe oublié
+        function showForgotPassword() {
+            showMessage('Fonction "Mot de passe oublié" en cours de développement', 'error');
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📝 DOM chargé - Initialisation');
+            
+            // Event listeners pour les formulaires
+            document.getElementById('registerForm').addEventListener('submit', handleRegister);
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+            
+            // Event listener pour la vérification du mot de passe
+            document.getElementById('regPassword').addEventListener('input', function() {
+                checkPasswordStrength(this.value);
+            });
+            
+            console.log('✅ Event listeners ajoutés');
+        });
+    </script>
+</body>
+</html>
